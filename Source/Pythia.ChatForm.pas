@@ -6,7 +6,7 @@ interface
 
 uses
   LCLIntf, LCLType, Classes, SysUtils, Forms, Controls, Graphics, Dialogs,
-  StdCtrls, ComCtrls, ExtCtrls;
+  StdCtrls, ComCtrls, ExtCtrls, Pythia.AI.Client;
 
 type
   TChatWindow = class(TForm)
@@ -20,6 +20,7 @@ type
     procedure ButtonSendClick(Sender: TObject);
     procedure MemoInputKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
   private
+    FMessages: TArray<TChatMessage>;
     FIsProcessing: Boolean;
     procedure AddMessage(const Role, Content: string);
     procedure SendMessageToAI;
@@ -32,7 +33,7 @@ var
 implementation
 
 uses
-  Pythia.AI.Client, Pythia.Config;
+  Pythia.Config;
 
 {$R *.lfm}
 
@@ -41,6 +42,9 @@ begin
   Caption := 'Pythia AI Chat';
   Width := 600;
   Height := 500;
+  
+  // Initialize message history
+  SetLength(FMessages, 0);
   
   // Setup chat display
   MemoChat.Align := alClient;
@@ -58,6 +62,8 @@ begin
   
   // Setup model selector
   ComboModel.Items.Clear;
+  ComboModel.Items.Add('GitHub Copilot: GPT-4');
+  ComboModel.Items.Add('GitHub Copilot: GPT-3.5 Turbo');
   ComboModel.Items.Add('GPT-4');
   ComboModel.Items.Add('GPT-3.5 Turbo');
   ComboModel.Items.Add('Claude 3.5 Sonnet');
@@ -66,7 +72,7 @@ begin
   
   FIsProcessing := False;
   
-  AddMessage('system', 'Pythia AI Chat - Ready! (Shift+Enter to send)');
+  AddMessage('assistant', 'Hello! I''m Pythia, your AI coding assistant for Delphi. How can I help you today?');
 end;
 
 procedure TChatWindow.ButtonSendClick(Sender: TObject);
@@ -90,8 +96,24 @@ end;
 procedure TChatWindow.AddMessage(const Role, Content: string);
 var
   Prefix: string;
+  Msg: TChatMessage;
 begin
-  if Role = 'user' then Prefix := '>>> YOU: ' else if Role = 'assistant' then Prefix := '<<< AI: ' else if Role = 'system' then Prefix := '=== ' else Prefix := '';
+  // Add to message history
+  Msg.Role := Role;
+  Msg.Content := Content;
+  Msg.Timestamp := Now;
+  SetLength(FMessages, Length(FMessages) + 1);
+  FMessages[High(FMessages)] := Msg;
+  
+  // Display in chat
+  if Role = 'user' then
+    Prefix := '>>> YOU: '
+  else if Role = 'assistant' then
+    Prefix := '<<< AI: '
+  else if Role = 'system' then
+    Prefix := '=== '
+  else
+    Prefix := '';
   
   MemoChat.Lines.Add('');
   MemoChat.Lines.Add(Prefix + Content);
@@ -115,15 +137,18 @@ begin
     
     Application.ProcessMessages;
     
-    // Call AI client (currently stubbed)
-    Response := TPythiaAIClient.SendMessage(
-      'You are Pythia, an expert Delphi programming assistant.',
-      UserMessage,
-      '',
-      ModelName
-    );
-    
-    AddMessage('assistant', Response);
+    // Call AI client with message history
+    try
+      Response := TPythiaAIClient.SendMessage(FMessages, ModelName);
+      
+      if Response <> '' then
+        AddMessage('assistant', Response)
+      else
+        AddMessage('assistant', 'Error: No response from AI');
+    except
+      on E: Exception do
+        AddMessage('assistant', 'Error: ' + E.Message);
+    end;
   finally
     FIsProcessing := False;
     ButtonSend.Enabled := True;
