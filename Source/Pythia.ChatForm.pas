@@ -18,6 +18,7 @@ type
     LabelModel: TLabel;
     procedure FormCreate(Sender: TObject);
     procedure ButtonSendClick(Sender: TObject);
+    procedure MemoInputKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
   private
     FIsProcessing: Boolean;
     procedure AddMessage(const Role, Content: string);
@@ -52,6 +53,9 @@ begin
   PanelInput.Align := alBottom;
   PanelInput.Height := 120;
   
+  // Wire up Shift+Enter handler
+  MemoInput.OnKeyDown := MemoInputKeyDown;
+  
   // Setup model selector
   ComboModel.Items.Clear;
   ComboModel.Items.Add('GPT-4');
@@ -62,7 +66,7 @@ begin
   
   FIsProcessing := False;
   
-  AddMessage('system', 'Pythia AI Chat (Lazarus version - HTTP client not yet implemented)');
+  AddMessage('system', 'Pythia AI Chat - Ready! (Shift+Enter to send)');
 end;
 
 procedure TChatWindow.ButtonSendClick(Sender: TObject);
@@ -71,6 +75,16 @@ begin
     Exit;
     
   SendMessageToAI;
+end;
+
+procedure TChatWindow.MemoInputKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+begin
+  // Shift+Enter sends the message
+  if (Key = VK_RETURN) and (ssShift in Shift) then
+  begin
+    Key := 0; // Consume the key
+    ButtonSendClick(nil);
+  end;
 end;
 
 procedure TChatWindow.AddMessage(const Role, Content: string);
