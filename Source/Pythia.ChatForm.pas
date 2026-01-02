@@ -43,6 +43,7 @@ type
     procedure UpdateStats;
     function GetGitBranch: string;
     function EstimateTokens(const Text: string): Integer;
+    function RenderMarkdown(const Text: string): string;
   public
   end;
 
@@ -198,6 +199,66 @@ begin
     [MessageCount, FTotalTokens, TotalChars]);
 end;
 
+function TChatWindow.RenderMarkdown(const Text: string): string;
+var
+  I: Integer;
+  InCodeBlock: Boolean;
+  Line, Output: string;
+  Lines: TStringList;
+begin
+  Lines := TStringList.Create;
+  try
+    Lines.Text := Text;
+    Output := '';
+    InCodeBlock := False;
+    
+    for I := 0 to Lines.Count - 1 do
+    begin
+      Line := Lines[I];
+      
+      // Code blocks
+      if (Length(Line) >= 3) and (Copy(Line, 1, 3) = '```') then
+      begin
+        InCodeBlock := not InCodeBlock;
+        if InCodeBlock then
+          Output := Output + '  --- CODE ---' + #13#10
+        else
+          Output := Output + '  -----------' + #13#10;
+        Continue;
+      end;
+      
+      if InCodeBlock then
+      begin
+        Output := Output + '  ' + Line + #13#10;
+        Continue;
+      end;
+      
+      // Headers
+      if (Length(Line) > 0) and (Line[1] = '#') then
+      begin
+        Line := StringReplace(Line, '#', '', [rfReplaceAll]);
+        Line := '*** ' + Trim(Line) + ' ***';
+      end;
+      
+      // Bold **text**
+      Line := StringReplace(Line, '**', '', [rfReplaceAll]);
+      
+      // Inline code `text`
+      Line := StringReplace(Line, '`', '''', [rfReplaceAll]);
+      
+      // Bullets
+      if (Length(Line) > 2) and (Copy(Line, 1, 2) = '- ') then
+        Line := '  * ' + Copy(Line, 3, Length(Line));
+      
+      Output := Output + Line + #13#10;
+    end;
+    
+    Result := Output;
+  finally
+    Lines.Free;
+  end;
+end;
+
 procedure TChatWindow.ButtonRefreshContextClick(Sender: TObject);
 begin
   UpdateStatusBar;
@@ -231,6 +292,7 @@ procedure TChatWindow.AddMessage(const Role, Content: string);
 var
   Prefix: string;
   Msg: TChatMessage;
+  DisplayContent: string;
 begin
   // Add to message history
   Msg.Role := Role;
@@ -241,16 +303,28 @@ begin
   
   // Display in chat
   if Role = 'user' then
-    Prefix := '>>> YOU: '
+  begin
+    Prefix := '>>> YOU: ';
+    DisplayContent := Content;
+  end
   else if Role = 'assistant' then
-    Prefix := '<<< AI: '
+  begin
+    Prefix := '<<< AI: ';
+    DisplayContent := RenderMarkdown(Content);  // Render markdown for AI responses
+  end
   else if Role = 'system' then
-    Prefix := '=== '
+  begin
+    Prefix := '=== ';
+    DisplayContent := Content;
+  end
   else
+  begin
     Prefix := '';
+    DisplayContent := Content;
+  end;
   
   MemoChat.Lines.Add('');
-  MemoChat.Lines.Add(Prefix + Content);
+  MemoChat.Lines.Add(Prefix + DisplayContent);
   MemoChat.Lines.Add('');
   
   // Update stats after adding message
