@@ -22,9 +22,9 @@ Remove-Item "lib" -Recurse -Force -ErrorAction SilentlyContinue
 Write-Host "Step 4: Rebuilding package..." -ForegroundColor Yellow
 C:\lazarus\lazbuild.exe --build-all pythia.lpk 2>&1 | Out-Null
 if ($LASTEXITCODE -eq 0) {
-    Write-Host "✓ Package compiled successfully" -ForegroundColor Green
+    Write-Host "[OK] Package compiled successfully" -ForegroundColor Green
 } else {
-    Write-Host "✗ Package compilation failed!" -ForegroundColor Red
+    Write-Host "[ERROR] Package compilation failed!" -ForegroundColor Red
     exit 1
 }
 
