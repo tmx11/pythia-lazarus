@@ -16,8 +16,8 @@ type
 
   TPythiaAIClient = class
   private
-    class function BuildOpenAIRequest(const Messages: TArray<TChatMessage>; const Model: string): string;
-    class function BuildAnthropicRequest(const Messages: TArray<TChatMessage>; const Model: string): string;
+    class function BuildOpenAIRequest(const Messages: TArray<TChatMessage>; const Model, Context: string): string;
+    class function BuildAnthropicRequest(const Messages: TArray<TChatMessage>; const Model, Context: string): string;
     class function BuildGitHubCopilotRequest(const Messages: TArray<TChatMessage>; const Model: string; const Context: string = ''): string;
     class function CallOpenAI(const RequestBody: string): string;
     class function CallAnthropic(const RequestBody: string): string;
@@ -77,14 +77,14 @@ begin
     else if Pos('GPT', UpperCase(Model)) > 0 then
     begin
       // OpenAI API
-      RequestBody := BuildOpenAIRequest(Messages, Model);
+      RequestBody := BuildOpenAIRequest(Messages, Model, '');
       Response := CallOpenAI(RequestBody);
       Result := ParseOpenAIResponse(Response);
     end
     else if Pos('CLAUDE', UpperCase(Model)) > 0 then
     begin
       // Anthropic API
-      RequestBody := BuildAnthropicRequest(Messages, Model);
+      RequestBody := BuildAnthropicRequest(Messages, Model, '');
       Response := CallAnthropic(RequestBody);
       Result := ParseAnthropicResponse(Response);
     end;
@@ -105,7 +105,7 @@ begin
   end;
 end;
 
-class function TPythiaAIClient.BuildOpenAIRequest(const Messages: TArray<TChatMessage>; const Model: string): string;
+class function TPythiaAIClient.BuildOpenAIRequest(const Messages: TArray<TChatMessage>; const Model, Context: string): string;
 var
   JSON, MsgObj: TJSONObject;
   MsgArray: TJSONArray;
@@ -131,24 +131,45 @@ begin
     // Add system message with file editing instructions
     MsgObj := TJSONObject.Create;
     MsgObj.Add('role', 'system');
-    MsgObj.Add('content', 'You are Pythia, an expert Delphi programming assistant. ' +
-      'Help users with Delphi code, explain concepts, debug issues, and provide best practices.' + #13#10 +
-      'When editing files, use this JSON format to REPLACE specific line ranges:' + #13#10 +
-      '```json' + #13#10 +
-      '{' + #13#10 +
-      '  "edits": [' + #13#10 +
-      '    {' + #13#10 +
-      '      "file": "Source/MyUnit.pas",' + #13#10 +
-      '      "startLine": 10,' + #13#10 +
-      '      "endLine": 12,' + #13#10 +
-      '      "newText": "  // Comment\n  Line11Code;\n  Line12Code;"' + #13#10 +
-      '    }' + #13#10 +
-      '  ]' + #13#10 +
-      '}' + #13#10 +
-      '```' + #13#10 +
-      'CRITICAL: Lines startLine through endLine are COMPLETELY REPLACED with newText. ' +
-      'If adding comments, you MUST include the original code + comment in newText. ' +
-      'Lines are 1-indexed. Multiple edits allowed.');
+    if Context <> '' then
+      MsgObj.Add('content', 'You are Pythia, an expert Delphi programming assistant. ' +
+        'Help users with Delphi code, explain concepts, debug issues, and provide best practices.' + #13#10 +
+        'When editing files, use this JSON format to REPLACE specific line ranges:' + #13#10 +
+        '```json' + #13#10 +
+        '{' + #13#10 +
+        '  "edits": [' + #13#10 +
+        '    {' + #13#10 +
+        '      "file": "Source/MyUnit.pas",' + #13#10 +
+        '      "startLine": 10,' + #13#10 +
+        '      "endLine": 12,' + #13#10 +
+        '      "newText": "  // Comment\n  Line11Code;\n  Line12Code;"' + #13#10 +
+        '    }' + #13#10 +
+        '  ]' + #13#10 +
+        '}' + #13#10 +
+        '```' + #13#10 +
+        'CRITICAL: Lines startLine through endLine are COMPLETELY REPLACED with newText. ' +
+        'If adding comments, you MUST include the original code + comment in newText. ' +
+        'Lines are 1-indexed. Multiple edits allowed.' + #13#10#13#10 +
+        'CURRENT IDE CONTEXT:' + #13#10 + Context)
+    else
+      MsgObj.Add('content', 'You are Pythia, an expert Delphi programming assistant. ' +
+        'Help users with Delphi code, explain concepts, debug issues, and provide best practices.' + #13#10 +
+        'When editing files, use this JSON format to REPLACE specific line ranges:' + #13#10 +
+        '```json' + #13#10 +
+        '{' + #13#10 +
+        '  "edits": [' + #13#10 +
+        '    {' + #13#10 +
+        '      "file": "Source/MyUnit.pas",' + #13#10 +
+        '      "startLine": 10,' + #13#10 +
+        '      "endLine": 12,' + #13#10 +
+        '      "newText": "  // Comment\n  Line11Code;\n  Line12Code;"' + #13#10 +
+        '    }' + #13#10 +
+        '  ]' + #13#10 +
+        '}' + #13#10 +
+        '```' + #13#10 +
+        'CRITICAL: Lines startLine through endLine are COMPLETELY REPLACED with newText. ' +
+        'If adding comments, you MUST include the original code + comment in newText. ' +
+        'Lines are 1-indexed. Multiple edits allowed.');
     MsgArray.Add(MsgObj);
     
     // Add conversation messages
@@ -167,7 +188,7 @@ begin
   end;
 end;
 
-class function TPythiaAIClient.BuildAnthropicRequest(const Messages: TArray<TChatMessage>; const Model: string): string;
+class function TPythiaAIClient.BuildAnthropicRequest(const Messages: TArray<TChatMessage>; const Model, Context: string): string;
 var
   JSON, MsgObj: TJSONObject;
   MsgArray: TJSONArray;
@@ -186,24 +207,45 @@ begin
   try
     JSON.Add('model', ModelName);
     JSON.Add('max_tokens', 4096);
-    JSON.Add('system', 'You are Pythia, an expert Delphi programming assistant. ' +
-      'Help users with Delphi code, explain concepts, debug issues, and provide best practices.' + #13#10 +
-      'When editing files, use this JSON format to REPLACE specific line ranges:' + #13#10 +
-      '```json' + #13#10 +
-      '{' + #13#10 +
-      '  "edits": [' + #13#10 +
-      '    {' + #13#10 +
-      '      "file": "Source/MyUnit.pas",' + #13#10 +
-      '      "startLine": 1,' + #13#10 +
-      '      "endLine": 1,' + #13#10 +
-      '      "newText": "// Header comment\nunit MyUnit;"' + #13#10 +
-      '    }' + #13#10 +
-      '  ]' + #13#10 +
-      '}' + #13#10 +
-      '```' + #13#10 +
-      'CRITICAL: Lines startLine through endLine are COMPLETELY REPLACED with newText. ' +
-      'Never duplicate lines - if line 1 is "unit X;", your newText should contain it ONCE. ' +
-      'If adding comments, include original code + comment in newText. Lines are 1-indexed.');
+    if Context <> '' then
+      JSON.Add('system', 'You are Pythia, an expert Delphi programming assistant. ' +
+        'Help users with Delphi code, explain concepts, debug issues, and provide best practices.' + #13#10 +
+        'When editing files, use this JSON format to REPLACE specific line ranges:' + #13#10 +
+        '```json' + #13#10 +
+        '{' + #13#10 +
+        '  "edits": [' + #13#10 +
+        '    {' + #13#10 +
+        '      "file": "Source/MyUnit.pas",' + #13#10 +
+        '      "startLine": 1,' + #13#10 +
+        '      "endLine": 1,' + #13#10 +
+        '      "newText": "// Header comment\nunit MyUnit;"' + #13#10 +
+        '    }' + #13#10 +
+        '  ]' + #13#10 +
+        '}' + #13#10 +
+        '```' + #13#10 +
+        'CRITICAL: Lines startLine through endLine are COMPLETELY REPLACED with newText. ' +
+        'Never duplicate lines - if line 1 is "unit X;", your newText should contain it ONCE. ' +
+        'If adding comments, include original code + comment in newText. Lines are 1-indexed.' + #13#10#13#10 +
+        'CURRENT IDE CONTEXT:' + #13#10 + Context)
+    else
+      JSON.Add('system', 'You are Pythia, an expert Delphi programming assistant. ' +
+        'Help users with Delphi code, explain concepts, debug issues, and provide best practices.' + #13#10 +
+        'When editing files, use this JSON format to REPLACE specific line ranges:' + #13#10 +
+        '```json' + #13#10 +
+        '{' + #13#10 +
+        '  "edits": [' + #13#10 +
+        '    {' + #13#10 +
+        '      "file": "Source/MyUnit.pas",' + #13#10 +
+        '      "startLine": 1,' + #13#10 +
+        '      "endLine": 1,' + #13#10 +
+        '      "newText": "// Header comment\nunit MyUnit;"' + #13#10 +
+        '    }' + #13#10 +
+        '  ]' + #13#10 +
+        '}' + #13#10 +
+        '```' + #13#10 +
+        'CRITICAL: Lines startLine through endLine are COMPLETELY REPLACED with newText. ' +
+        'Never duplicate lines - if line 1 is "unit X;", your newText should contain it ONCE. ' +
+        'If adding comments, include original code + comment in newText. Lines are 1-indexed.');
     
     MsgArray := TJSONArray.Create;
     
@@ -503,17 +545,31 @@ begin
   InitializeSSL;
 
   try
-    // Currently only GitHub Copilot supports context injection
+    // All models now support context injection
     if Pos('COPILOT', UpperCase(Model)) > 0 then
     begin
       RequestBody := BuildGitHubCopilotRequest(Messages, Model, Context);
       Response := CallGitHubCopilot(RequestBody);
       Result := ParseOpenAIResponse(Response);
     end
+    else if Pos('GPT', UpperCase(Model)) > 0 then
+    begin
+      RequestBody := BuildOpenAIRequest(Messages, Model, Context);
+      Response := CallOpenAI(RequestBody);
+      Result := ParseOpenAIResponse(Response);
+    end
+    else if Pos('CLAUDE', UpperCase(Model)) > 0 then
+    begin
+      RequestBody := BuildAnthropicRequest(Messages, Model, Context);
+      Response := CallAnthropic(RequestBody);
+      Result := ParseAnthropicResponse(Response);
+    end
     else
     begin
-      // Fall back to regular SendMessage for other models
-      Result := SendMessage(Messages, Model);
+      // Fallback for unknown models
+      RequestBody := BuildOpenAIRequest(Messages, Model, Context);
+      Response := CallOpenAI(RequestBody);
+      Result := ParseOpenAIResponse(Response);
     end;
   except
     on E: Exception do
