@@ -26,6 +26,10 @@ begin
   // Create form
   AForm := TChatWindow.Create(nil);
   AForm.Name := aFormName;
+  
+  // Handle auto-sizing - critical for docking persistence
+  if DoDisableAutoSizing then
+    AForm.DisableAutoSizing;
 end;
 
 procedure ShowPythiaChatWindow(Sender: TObject);
