@@ -24,6 +24,7 @@ type
     class var FUsername: string;
     class var FStatus: TGitHubAuthStatus;
     class var FTokenExpiresAt: TDateTime;
+    class function GetCopilotToken: string;
   public
     class function StartDeviceFlow(out DeviceCode: string; out UserCode: string; out VerificationUri: string): Boolean;
     class function PollForToken(const DeviceCode: string): TGitHubAuthResult;
@@ -159,11 +160,77 @@ begin
   end;
 end;
 
+class function TGitHubCopilotAuth.GetCopilotToken: string;
+var
+  HttpClient: TFPHTTPClient;
+  ResponseStream: TStringStream;
+  JSON: TJSONData;
+begin
+  // If we have a cached Copilot token that hasn't expired, use it
+  if (FCopilotToken <> '') and (Now < FTokenExpiresAt) then
+  begin
+    Result := FCopilotToken;
+    Exit;
+  end;
+  
+  // Exchange OAuth token for Copilot token
+  if FAuthToken = '' then
+  begin
+    LoadCachedToken;
+    if FAuthToken = '' then
+    begin
+      Result := '';
+      Exit;
+    end;
+  end;
+  
+  HttpClient := TFPHTTPClient.Create(nil);
+  try
+    HttpClient.AddHeader('Authorization', 'token ' + FAuthToken);
+    HttpClient.AddHeader('Accept', 'application/json');
+    HttpClient.AddHeader('Editor-Version', 'vscode/1.85.0');
+    HttpClient.AddHeader('Editor-Plugin-Version', 'copilot-chat/0.11.0');
+    HttpClient.AddHeader('User-Agent', 'GithubCopilot/1.0');
+    
+    ResponseStream := TStringStream.Create('', TEncoding.UTF8);
+    try
+      try
+        HttpClient.Get(GITHUB_COPILOT_TOKEN_URL, ResponseStream);
+        
+        JSON := GetJSON(ResponseStream.DataString);
+        try
+          if JSON is TJSONObject then
+          begin
+            FCopilotToken := TJSONObject(JSON).Get('token', '');
+            // Token typically expires in 30 minutes
+            FTokenExpiresAt := Now + (25 / (24 * 60)); // 25 minutes to be safe
+            Result := FCopilotToken;
+          end
+          else
+            Result := '';
+        finally
+          JSON.Free;
+        end;
+      except
+        on E: Exception do
+        begin
+          // If we can't get Copilot token, return empty
+          Result := '';
+          FCopilotToken := '';
+        end;
+      end;
+    finally
+      ResponseStream.Free;
+    end;
+  finally
+    HttpClient.Free;
+  end;
+end;
+
 class function TGitHubCopilotAuth.GetAuthToken: string;
 begin
-  if FAuthToken = '' then
-    LoadCachedToken;
-  Result := FAuthToken;
+  // Return the Copilot-specific token, not the OAuth token
+  Result := GetCopilotToken;
 end;
 
 class function TGitHubCopilotAuth.GetUsername: string;
