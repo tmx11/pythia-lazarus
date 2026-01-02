@@ -5,7 +5,7 @@ unit Pythia.AI.Client;
 interface
 
 uses
-  SysUtils, Classes, fpjson, jsonparser, fphttpclient, opensslsockets;
+  SysUtils, Classes, fpjson, jsonparser, fphttpclient, openssl, opensslsockets;
 
 type
   TChatMessage = record
@@ -33,6 +33,23 @@ implementation
 uses
   Pythia.Config, Pythia.GitHub.Auth;
 
+var
+  SSLInitialized: Boolean = False;
+
+procedure InitializeSSL;
+begin
+  if not SSLInitialized then
+  begin
+    // Configure SSL library DLL names for Windows (use OpenSSL 1.1 or 3.x)
+    DLLSSLName := 'libssl-1_1-x64.dll';
+    DLLSSLName2 := 'libssl-3-x64.dll';
+    DLLSSLName3 := 'libssl-3.dll';
+    DLLUtilName := 'libcrypto-1_1-x64.dll';
+    DLLUtilName2 := 'libcrypto-3-x64.dll';
+    SSLInitialized := True;
+  end;
+end;
+
 { TPythiaAIClient }
 
 class function TPythiaAIClient.SendMessage(const SystemPrompt, UserMessage, ConversationHistory, ModelName: string): string;
@@ -41,6 +58,9 @@ var
   RequestBody, Response: string;
 begin
   Result := '';
+  
+  // Initialize SSL on first use
+  InitializeSSL;
   
   try
     // Build message array
