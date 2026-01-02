@@ -8,9 +8,16 @@ uses
   LCLIntf, LCLType, Classes, SysUtils, Forms, Controls, Graphics, Dialogs,
   StdCtrls, ComCtrls, ExtCtrls, Pythia.AI.Client;
 
+const
+  PYTHIA_VERSION = 'v1.0.2-20260101';
+
 type
   TChatWindow = class(TForm)
     MemoChat: TMemo;
+    PanelStatus: TPanel;
+    LabelVersion: TLabel;
+    LabelCurrentFile: TLabel;
+    ButtonRefreshContext: TButton;
     PanelInput: TPanel;
     MemoInput: TMemo;
     ButtonSend: TButton;
@@ -20,12 +27,14 @@ type
     procedure FormCreate(Sender: TObject);
     procedure ButtonSendClick(Sender: TObject);
     procedure ButtonSettingsClick(Sender: TObject);
+    procedure ButtonRefreshContextClick(Sender: TObject);
     procedure MemoInputKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
   private
     FMessages: TArray<TChatMessage>;
     FIsProcessing: Boolean;
     procedure AddMessage(const Role, Content: string);
     procedure SendMessageToAI;
+    procedure UpdateCurrentFileStatus;
   public
   end;
 
@@ -41,12 +50,20 @@ uses
 
 procedure TChatWindow.FormCreate(Sender: TObject);
 begin
-  Caption := 'Pythia AI Chat';
+  Caption := 'Pythia AI Chat ' + PYTHIA_VERSION;
   Width := 600;
   Height := 500;
   
+  // Setup status panel
+  PanelStatus.Align := alTop;
+  PanelStatus.Height := 28;
+  LabelVersion.Caption := 'Pythia ' + PYTHIA_VERSION;
+  
   // Initialize message history
   SetLength(FMessages, 0);
+  
+  // Update current file status
+  UpdateCurrentFileStatus;
   
   // Setup chat display
   MemoChat.Align := alClient;
@@ -75,6 +92,29 @@ begin
   FIsProcessing := False;
   
   AddMessage('assistant', 'Hello! I''m Pythia, your AI coding assistant for Delphi. How can I help you today?');
+end;
+
+procedure TChatWindow.UpdateCurrentFileStatus;
+var
+  ContextProvider: IContextProvider;
+  Context: TContextItem;
+begin
+  ContextProvider := GetContextProvider;
+  if Assigned(ContextProvider) and ContextProvider.IsAvailable then
+  begin
+    Context := ContextProvider.GetCurrentFile;
+    if Context.FilePath <> '' then
+      LabelCurrentFile.Caption := 'File: ' + ExtractFileName(Context.FilePath)
+    else
+      LabelCurrentFile.Caption := 'File: (none)';
+  end
+  else
+    LabelCurrentFile.Caption := 'File: (context unavailable)';
+end;
+
+procedure TChatWindow.ButtonRefreshContextClick(Sender: TObject);
+begin
+  UpdateCurrentFileStatus;
 end;
 
 procedure TChatWindow.ButtonSettingsClick(Sender: TObject);
@@ -174,6 +214,9 @@ begin
     except
       // Context gathering failed - continue without context
     end;
+
+    // Update status bar with current file
+    UpdateCurrentFileStatus;
 
     // Call AI client with message history and context
     try
