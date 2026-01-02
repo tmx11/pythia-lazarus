@@ -62,6 +62,15 @@ object ChatWindow: TChatWindow
       OnClick = ButtonRefreshContextClick
       TabOrder = 0
     end
+    object CheckBoxRenderMarkdown: TCheckBox
+      Left = 4
+      Height = 19
+      Top = 27
+      Width = 120
+      Caption = 'Render Markdown'
+      Checked = False
+      TabOrder = 1
+    end
   end
   object MemoChat: TMemo
     Left = 0

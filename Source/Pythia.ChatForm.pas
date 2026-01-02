@@ -20,6 +20,7 @@ type
     LabelCurrentFile: TLabel;
     LabelStats: TLabel;
     ButtonRefreshContext: TButton;
+    CheckBoxRenderMarkdown: TCheckBox;
     PanelInput: TPanel;
     MemoInput: TMemo;
     ButtonSend: TButton;
@@ -216,14 +217,11 @@ begin
     begin
       Line := Lines[I];
       
-      // Code blocks
+      // Code blocks (standard markdown)
       if (Length(Line) >= 3) and (Copy(Line, 1, 3) = '```') then
       begin
         InCodeBlock := not InCodeBlock;
-        if InCodeBlock then
-          Output := Output + '  --- CODE ---' + #13#10
-        else
-          Output := Output + '  -----------' + #13#10;
+        Output := Output + '```' + #13#10;
         Continue;
       end;
       
@@ -310,7 +308,11 @@ begin
   else if Role = 'assistant' then
   begin
     Prefix := '<<< AI: ';
-    DisplayContent := RenderMarkdown(Content);  // Render markdown for AI responses
+    // Only render markdown if checkbox is enabled
+    if CheckBoxRenderMarkdown.Checked then
+      DisplayContent := RenderMarkdown(Content)
+    else
+      DisplayContent := Content;  // Show raw markdown
   end
   else if Role = 'system' then
   begin
