@@ -1,13 +1,16 @@
-# Pythia - AI Copilot for Delphi IDE
+# Pythia - AI Copilot for Lazarus IDE
 
-A VS Code Copilot-style AI chat assistant plugin for Embarcadero Delphi 12.
+A VS Code Copilot-style AI chat assistant plugin for Lazarus IDE (Free Pascal).
 
 ## Features
 
 - **GitHub Copilot Integration**: Use GitHub Copilot Chat (FREE tier) - no API keys required! 🆓
-- **Integrated Chat Window**: VS Code-style chat interface accessible via `Tools > Pythia AI Chat` or `Ctrl+Shift+P`
+- **Integrated Chat Window**: VS Code-style chat interface accessible via `View > IDE Internals Windows > PythiaChatWindow`
 - **Multiple AI Models**: GitHub Copilot (GPT-4, Claude 3.5), OpenAI, Anthropic
-- **Delphi Expert**: Trained to help with Delphi programming questions, code review, and debugging
+- **Lazarus Expert**: Trained to help with Free Pascal/Object Pascal programming in Lazarus IDE
+- **Dockable Window**: Chat window integrates seamlessly into Lazarus IDE
+- **Context Awareness**: AI sees your current file, cursor position, and selection
+- **Command-Line Build**: Full `lazbuild` automation without IDE restrictions
 - **Persistent Configuration**: OAuth tokens stored securely in user's AppData folder
 
 ## Development Workflow
@@ -15,42 +18,43 @@ A VS Code Copilot-style AI chat assistant plugin for Embarcadero Delphi 12.
 ### Quick Testing (Standalone App)
 For rapid development without IDE reinstallation:
 
-1. Open `PythiaApp.dproj` in Delphi 12
+1. Open `PythiaApp.dproj` in Lazarus IDE
 2. Press **F9** to compile and run
 3. Test chat functionality in standalone window
 4. Make changes, rebuild, repeat
 
 ### IDE Plugin Installation
-Once features are verified in standalone app:
 
-#### Option 1: Clean Install (Recommended)
-Run the automated clean install script to remove old installations:
+#### Automated Clean Install (Recommended)
+Run the PowerShell script to completely rebuild and install:
 ```powershell
-.\clean-install.ps1
+.\CLEAN_INSTALL.ps1
 ```
 This will:
-- Stop Delphi IDE
-- Remove all old Pythia registry entries
-- Clean build the package to `Win32\Debug\pythia.bpl`
-- Install to IDE and restart Delphi
+- Stop Lazarus IDE
+- Remove all old Pythia package registrations
+- Clean build artifacts from `lib/` directory
+- Compile package with `lazbuild --build-all pythia.lpk`
+- Rebuild entire IDE with `lazbuild --add-package pythia.lpk --build-ide=`
+- Start Lazarus with Pythia installed
 
-#### Option 2: Manual Installation
-1. Close Delphi IDE completely
-2. Open `pythia.dproj` in Delphi 12
-3. Build the package: **Shift+F9** or **Project > Build pythia**
-4. BPL will be in: `Win32\Debug\pythia.bpl`
-5. Open **Component > Install Packages**
-6. Click **Add**, browse to `Win32\Debug\pythia.bpl`
-7. Click **OK** and restart Delphi
+#### Manual Installation via lazbuild
+```bash
+# 1. Build package
+lazbuild --build-all pythia.lpk
+
+# 2. Stop IDE and rebuild with package
+taskkill /F /IM lazarus.exe
+lazbuild --add-package pythia.lpk --build-ide=
+
+# 3. Start IDE
+C:\lazarus\lazarus.exe
+```
 
 **Access Pythia:**
-- Menu: **Tools > Pythia AI Chat...**
-- Keyboard: **Ctrl+Shift+P**
+- Menu: **View > IDE Internals Windows > PythiaChatWindow**
 
-**Troubleshooting Duplicates:**
-If you see duplicate menu items, run `.\clean-install.ps1` to completely remove old installations.
-
-**Both projects share the same Source/*.pas units** - changes automatically work in both!
+**Both projects (pythia.lpk and PythiaApp.dpr) share the same Source/*.pas units** - changes automatically work in both!
 
 ## Configuration
 
@@ -77,44 +81,52 @@ Configuration is stored in: `%APPDATA%\Pythia\pythia.ini`
 ### Using the Chat
 1. Select your preferred AI model from the dropdown
 2. Type your question or request in the input box
-3. Press **Send** button or **Ctrl+Enter**
-4. View the AI response in the chat window
+3. Press **Send** button or **Enter**
+4. View the AI response in the chat window (word-wrapped with code block formatting)
 
 ### Example Prompts
-- "How do I implement a thread-safe singleton in Delphi?"
-- "Review this code for memory leaks"
-- "What's the best way to parse JSON in Delphi?"
-- "Convert this code to use generics"
+- "How do I implement a thread-safe singleton in Free Pascal?"
+- "Review this code for memory leaks in Lazarus"
+- "What's the best way to parse JSON in Free Pascal?"
+- "Convert this code to use Free Pascal generics"
+- "How do I create a custom component for Lazarus?"
 
 ## Project Structure
 
 ```
-pythia2/
+pythia-lazarus/
 ├── Source/
 │   ├── Pythia.Register.pas      # IDE plugin registration
-│   ├── Pythia.ChatForm.pas/.dfm # Chat UI form
+│   ├── Pythia.ChatForm.pas/.lfm # Chat UI form (Lazarus)
 │   ├── Pythia.AI.Client.pas     # AI API client
-│   └── Pythia.Config.pas        # Configuration manager
-├── pythia.dpk                   # Package source
-└── pythia.dproj                 # Project file
+│   ├── Pythia.Config.pas        # Configuration manager
+│   ├── Pythia.Context.pas       # IDE context extraction
+│   └── Pythia.FileEdit.pas      # File editing integration
+├── pythia.lpk                   # Lazarus package file
+├── pythia.pas                   # Package unit
+├── PythiaApp.dpr                # Standalone test app
+├── CLEAN_INSTALL.ps1            # Automated installation
+└── README.md                    # This file
 ```
 
 ## Requirements
 
-- Embarcadero Delphi 12 (Athens)
-- Windows 32-bit or 64-bit
+- **Lazarus IDE 3.2.0** or later
+- **Free Pascal Compiler 3.2.2** or later
+- Windows (64-bit recommended)
 - Internet connection for AI API calls
-- Valid API key(s) for OpenAI and/or Anthropic
+- Optional: API key(s) for OpenAI and/or Anthropic (GitHub Copilot is FREE)
 
 ## Development
 
 To modify or extend Pythia:
 
-1. Clone/open the project in Delphi 12
-2. Make your changes to the source files
-3. Rebuild the package
-4. Uninstall old version from IDE if needed
-5. Install the new version
+1. Clone repository: `git clone git@github.com:tmx11/pythia-lazarus.git`
+2. Open `pythia.lpk` or `PythiaApp.dpr` in Lazarus IDE
+3. Make your changes to the source files in `Source/`
+4. Test with PythiaApp first (F9 to run standalone)
+5. Run `.\CLEAN_INSTALL.ps1` to rebuild IDE plugin
+6. Access via **View > IDE Internals Windows > PythiaChatWindow**
 
 ## API Costs
 
@@ -125,40 +137,60 @@ Both OpenAI and Anthropic charge per API usage. Monitor your usage:
 ## Troubleshooting
 
 **Chat window doesn't appear**
-- Ensure package is properly installed
-- Check IDE's Package list (Component > Install Packages)
-- Restart Delphi IDE
+- Check **View > IDE Internals Windows** menu
+- Ensure package is properly installed via `lazbuild --add-package`
+- Restart Lazarus IDE
+- Run `.\CLEAN_INSTALL.ps1` for clean reinstall
 
 **API errors**
 - Verify API keys are correct in Settings
+- For GitHub Copilot: Re-authenticate via Settings > Sign in with GitHub
 - Check internet connection
-- Ensure you have API credits remaining
+- Ensure you have API credits remaining (OpenAI/Anthropic)
 
 **Build errors**
-- Verify Delphi 12 is properly installed
-- Check all source files are present
-- Clean and rebuild the project
+- Verify Lazarus 3.2.0+ and FPC 3.2.2+ are installed
+- Check all source files are present in `Source/` directory
+- Run `lazbuild --build-all pythia.lpk` to see detailed errors
+- Clean lib directory: `Remove-Item lib -Recurse -Force`
+
+**Word wrap issues**
+- Word wrap is enabled by default in TMemo
+- Long lines automatically wrap in chat window
 
 ## License
 
-[Your License Here]
+MIT License - See LICENSE file for details
 
 ## Contributing
 
-Contributions welcome! Please submit pull requests or open issues for bugs/features.
+Contributions welcome! This project was ported from Delphi to Lazarus for freedom from licensing restrictions.
+
+**Key Differences from Delphi:**
+- Uses `.lpk` (Lazarus package) instead of `.dpk`
+- Uses `.lfm` (Lazarus form) instead of `.dfm`
+- Compiled with Free Pascal Compiler (FPC) instead of Delphi compiler
+- Command-line build via `lazbuild` (no IDE restrictions)
+- Dockable windows via `IDEWindowIntf` unit
 
 ## Roadmap
 
-- [ ] Settings dialog with API key management
-- [ ] Code context awareness (send selected editor code)
-- [ ] Syntax highlighting in chat responses
-- [ ] Export chat history
-- [ ] Custom system prompts
-- [ ] Inline code suggestions
-- [ ] Integration with IDE code editor
+- [x] Port from Delphi 12 to Lazarus IDE
+- [x] Command-line build process with lazbuild
+- [x] Dockable chat window
+- [x] IDE context extraction (current file, cursor, selection)
+- [x] Status bar with version, git branch, file, stats
+- [x] Word wrap for long messages
+- [x] Code block formatting (indented with 4 spaces)
+- [x] Visual markers [USER]/[AI] for message distinction
+- [ ] Syntax highlighting for code blocks
+- [ ] Todo list pane with beads integration
+- [ ] Terminal integration for running commands
+- [ ] Diff viewer for file edits
+- [ ] Persistent chat history
 
 ## Credits
 
-Created by [Your Name]
+Originally created for Delphi 12, ported to Lazarus IDE for open-source freedom.
 
 Inspired by GitHub Copilot Chat in VS Code.

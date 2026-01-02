@@ -132,8 +132,8 @@ begin
     MsgObj := TJSONObject.Create;
     MsgObj.Add('role', 'system');
     if Context <> '' then
-      MsgObj.Add('content', 'You are Pythia, an expert Delphi programming assistant. ' +
-        'Help users with Delphi code, explain concepts, debug issues, and provide best practices.' + #13#10 +
+      MsgObj.Add('content', 'You are Pythia, an expert Free Pascal and Lazarus IDE programming assistant. ' +
+        'Help users with Object Pascal code in Lazarus IDE, explain concepts, debug issues, and provide best practices for Free Pascal Compiler (FPC) 3.2.2 and Lazarus 3.2.0.' + #13#10 +
         'When editing files, use this JSON format to REPLACE specific line ranges:' + #13#10 +
         '```json' + #13#10 +
         '{' + #13#10 +
@@ -152,8 +152,8 @@ begin
         'Lines are 1-indexed. Multiple edits allowed.' + #13#10#13#10 +
         'CURRENT IDE CONTEXT:' + #13#10 + Context)
     else
-      MsgObj.Add('content', 'You are Pythia, an expert Delphi programming assistant. ' +
-        'Help users with Delphi code, explain concepts, debug issues, and provide best practices.' + #13#10 +
+      MsgObj.Add('content', 'You are Pythia, an expert Free Pascal and Lazarus IDE programming assistant. ' +
+        'Help users with Object Pascal code in Lazarus IDE, explain concepts, debug issues, and provide best practices for Free Pascal Compiler (FPC) 3.2.2 and Lazarus 3.2.0.' + #13#10 +
         'When editing files, use this JSON format to REPLACE specific line ranges:' + #13#10 +
         '```json' + #13#10 +
         '{' + #13#10 +
@@ -208,8 +208,8 @@ begin
     JSON.Add('model', ModelName);
     JSON.Add('max_tokens', 4096);
     if Context <> '' then
-      JSON.Add('system', 'You are Pythia, an expert Delphi programming assistant. ' +
-        'Help users with Delphi code, explain concepts, debug issues, and provide best practices.' + #13#10 +
+      JSON.Add('system', 'You are Pythia, an expert Free Pascal and Lazarus IDE programming assistant. ' +
+        'Help users with Object Pascal code in Lazarus IDE, explain concepts, debug issues, and provide best practices for Free Pascal Compiler (FPC) 3.2.2 and Lazarus 3.2.0.' + #13#10 +
         'When editing files, use this JSON format to REPLACE specific line ranges:' + #13#10 +
         '```json' + #13#10 +
         '{' + #13#10 +
@@ -228,8 +228,8 @@ begin
         'If adding comments, include original code + comment in newText. Lines are 1-indexed.' + #13#10#13#10 +
         'CURRENT IDE CONTEXT:' + #13#10 + Context)
     else
-      JSON.Add('system', 'You are Pythia, an expert Delphi programming assistant. ' +
-        'Help users with Delphi code, explain concepts, debug issues, and provide best practices.' + #13#10 +
+      JSON.Add('system', 'You are Pythia, an expert Free Pascal and Lazarus IDE programming assistant. ' +
+        'Help users with Object Pascal code in Lazarus IDE, explain concepts, debug issues, and provide best practices for Free Pascal Compiler (FPC) 3.2.2 and Lazarus 3.2.0.' + #13#10 +
         'When editing files, use this JSON format to REPLACE specific line ranges:' + #13#10 +
         '```json' + #13#10 +
         '{' + #13#10 +
