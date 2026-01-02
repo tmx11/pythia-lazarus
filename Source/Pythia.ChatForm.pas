@@ -6,11 +6,20 @@ interface
 
 uses
   LCLIntf, LCLType, Classes, SysUtils, Forms, Controls, Graphics, Dialogs,
-  StdCtrls, ComCtrls, ExtCtrls, Pythia.AI.Client;
+  StdCtrls, ComCtrls, ExtCtrls, Process, Pythia.AI.Client;
+
+const
+  PYTHIA_VERSION = 'v1.0.3-20260102';
 
 type
   TChatWindow = class(TForm)
     MemoChat: TMemo;
+    PanelStatus: TPanel;
+    LabelVersion: TLabel;
+    LabelGitBranch: TLabel;
+    LabelCurrentFile: TLabel;
+    LabelStats: TLabel;
+    ButtonRefreshContext: TButton;
     PanelInput: TPanel;
     MemoInput: TMemo;
     ButtonSend: TButton;
@@ -20,12 +29,20 @@ type
     procedure FormCreate(Sender: TObject);
     procedure ButtonSendClick(Sender: TObject);
     procedure ButtonSettingsClick(Sender: TObject);
+    procedure ButtonRefreshContextClick(Sender: TObject);
     procedure MemoInputKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
   private
     FMessages: TArray<TChatMessage>;
     FIsProcessing: Boolean;
+    FTotalTokens: Integer;
     procedure AddMessage(const Role, Content: string);
     procedure SendMessageToAI;
+    procedure UpdateStatusBar;
+    procedure UpdateGitBranch;
+    procedure UpdateCurrentFile;
+    procedure UpdateStats;
+    function GetGitBranch: string;
+    function EstimateTokens(const Text: string): Integer;
   public
   end;
 
@@ -41,12 +58,20 @@ uses
 
 procedure TChatWindow.FormCreate(Sender: TObject);
 begin
-  Caption := 'Pythia AI Chat';
+  Caption := 'Pythia AI Chat ' + PYTHIA_VERSION;
   Width := 600;
   Height := 500;
   
-  // Initialize message history
+  // Initialize state
   SetLength(FMessages, 0);
+  FTotalTokens := 0;
+  
+  // Setup status panel
+  PanelStatus.Align := alTop;
+  PanelStatus.Height := 28;
+  
+  // Update all status elements
+  UpdateStatusBar;
   
   // Setup chat display
   MemoChat.Align := alClient;
@@ -75,6 +100,107 @@ begin
   FIsProcessing := False;
   
   AddMessage('assistant', 'Hello! I''m Pythia, your AI coding assistant for Delphi. How can I help you today?');
+  UpdateStats;
+end;
+
+procedure TChatWindow.UpdateStatusBar;
+begin
+  LabelVersion.Caption := 'Pythia ' + PYTHIA_VERSION;
+  UpdateGitBranch;
+  UpdateCurrentFile;
+  UpdateStats;
+end;
+
+function TChatWindow.GetGitBranch: string;
+var
+  Process: TProcess;
+  Output: string;
+  BytesRead: Integer;
+  Buffer: array[0..2047] of Byte;
+begin
+  Result := '(unknown)';
+  Process := TProcess.Create(nil);
+  try
+    Process.Executable := 'git';
+    Process.Parameters.Add('rev-parse');
+    Process.Parameters.Add('--abbrev-ref');
+    Process.Parameters.Add('HEAD');
+    Process.Options := [poUsePipes, poNoConsole];
+    try
+      Process.Execute;
+      if Process.Running then
+        Process.WaitOnExit;
+      
+      if Process.ExitStatus = 0 then
+      begin
+        BytesRead := Process.Output.Read(Buffer, SizeOf(Buffer));
+        if BytesRead > 0 then
+        begin
+          SetString(Output, PChar(@Buffer[0]), BytesRead);
+          Result := Trim(Output);
+        end;
+      end;
+    except
+      // Git not available or not a git repo
+    end;
+  finally
+    Process.Free;
+  end;
+end;
+
+procedure TChatWindow.UpdateGitBranch;
+var
+  Branch: string;
+begin
+  Branch := GetGitBranch;
+  LabelGitBranch.Caption := 'Branch: ' + Branch;
+end;
+
+procedure TChatWindow.UpdateCurrentFile;
+var
+  ContextProvider: IContextProvider;
+  Context: TContextItem;
+begin
+  ContextProvider := GetContextProvider;
+  if Assigned(ContextProvider) and ContextProvider.IsAvailable then
+  begin
+    Context := ContextProvider.GetCurrentFile;
+    if Context.FilePath <> '' then
+      LabelCurrentFile.Caption := 'File: ' + ExtractFileName(Context.FilePath)
+    else
+      LabelCurrentFile.Caption := 'File: (none)';
+  end
+  else
+    LabelCurrentFile.Caption := 'File: (none)';
+end;
+
+function TChatWindow.EstimateTokens(const Text: string): Integer;
+begin
+  // Rough estimate: ~4 characters per token for English
+  Result := Length(Text) div 4;
+end;
+
+procedure TChatWindow.UpdateStats;
+var
+  MessageCount: Integer;
+  TotalChars: Integer;
+  I: Integer;
+begin
+  MessageCount := Length(FMessages);
+  TotalChars := 0;
+  
+  for I := 0 to MessageCount - 1 do
+    TotalChars := TotalChars + Length(FMessages[I].Content);
+  
+  FTotalTokens := EstimateTokens(IntToStr(TotalChars));
+  
+  LabelStats.Caption := Format('Messages: %d | Est. Tokens: ~%d | Chars: %d', 
+    [MessageCount, FTotalTokens, TotalChars]);
+end;
+
+procedure TChatWindow.ButtonRefreshContextClick(Sender: TObject);
+begin
+  UpdateStatusBar;
 end;
 
 procedure TChatWindow.ButtonSettingsClick(Sender: TObject);
@@ -126,6 +252,9 @@ begin
   MemoChat.Lines.Add('');
   MemoChat.Lines.Add(Prefix + Content);
   MemoChat.Lines.Add('');
+  
+  // Update stats after adding message
+  UpdateStats;
 end;
 
 procedure TChatWindow.SendMessageToAI;

@@ -28,19 +28,19 @@ if ($LASTEXITCODE -eq 0) {
     exit 1
 }
 
-# Step 5: Start Lazarus
-Write-Host ""
-Write-Host "Step 5: Starting Lazarus with clean state..." -ForegroundColor Yellow
-Start-Process "C:\lazarus\lazarus.exe"
+# Step 5: Install package and rebuild IDE
+Write-Host "Step 5: Installing package into IDE and rebuilding..." -ForegroundColor Yellow
+Write-Host "This will take 1-2 minutes, please wait..."
+C:\lazarus\lazbuild.exe --add-package "$PWD\pythia.lpk" --build-ide= 2>&1 | Out-Null
+if ($LASTEXITCODE -eq 0) {
+    Write-Host "[OK] IDE rebuilt with package installed" -ForegroundColor Green
+} else {
+    Write-Host "[ERROR] IDE rebuild failed - check errors above" -ForegroundColor Red
+    exit 1
+}
 
 Write-Host ""
-Write-Host "=== MANUAL STEPS ===" -ForegroundColor Cyan
-Write-Host "1. Wait for Lazarus to fully start"
-Write-Host "2. Package -> Open Package File"
-Write-Host "3. Browse to: $PWD\pythia.lpk"
-Write-Host "4. Click 'Compile' button (check for errors in Messages)"
-Write-Host "5. If no errors, click 'Use' then 'Install'"
-Write-Host "6. Wait for IDE to rebuild (1-2 minutes)"
-Write-Host "7. After restart, go to: View -> IDE Internals Windows -> PythiaChatWindow"
+Write-Host "=== INSTALLATION COMPLETE ===" -ForegroundColor Green
+Write-Host "The package has been installed and IDE rebuilt automatically."
+Write-Host "After Lazarus starts, access via: View -> IDE Internals Windows -> Pythia AI Chat"
 Write-Host ""
-Write-Host "If access violation still occurs, the problem is in ChatForm.pas initialization." -ForegroundColor Yellow
