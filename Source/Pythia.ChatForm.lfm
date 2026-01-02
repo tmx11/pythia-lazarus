@@ -21,7 +21,7 @@ object ChatWindow: TChatWindow
       Left = 4
       Height = 15
       Top = 4
-      Width = 200
+      Width = 140
       AutoSize = False
       Caption = 'Pythia v1.0.3'
       Font.Style = [fsBold]
@@ -31,44 +31,44 @@ object ChatWindow: TChatWindow
       Left = 4
       Height = 15
       Top = 22
-      Width = 200
+      Width = 140
       AutoSize = False
       Caption = 'Branch: main'
     end
     object LabelCurrentFile: TLabel
-      Left = 210
+      Left = 150
       Height = 15
       Top = 4
-      Width = 270
+      Width = 230
       AutoSize = False
       Caption = 'File: (none)'
     end
     object LabelStats: TLabel
-      Left = 210
+      Left = 150
       Height = 15
       Top = 22
-      Width = 270
+      Width = 230
       AutoSize = False
       Caption = 'Messages: 0 | Tokens: 0'
       Font.Color = clGray
       ParentFont = False
     end
-    object ButtonRefreshContext: TButton
-      Left = 490
-      Height = 44
-      Top = 3
-      Width = 100
-      Caption = 'Refresh'
-      OnClick = ButtonRefreshContextClick
+    object CheckBoxRenderMarkdown: TCheckBox
+      Left = 385
+      Height = 19
+      Top = 4
+      Width = 95
+      Caption = 'Clean Text'
+      Checked = False
       TabOrder = 0
     end
-    object CheckBoxRenderMarkdown: TCheckBox
-      Left = 4
-      Height = 19
-      Top = 27
-      Width = 120
-      Caption = 'Render Markdown'
-      Checked = False
+    object ButtonRefreshContext: TButton
+      Left = 385
+      Height = 25
+      Top = 22
+      Width = 95
+      Caption = 'Refresh'
+      OnClick = ButtonRefreshContextClick
       TabOrder = 1
     end
   end
