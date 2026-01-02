@@ -1,0 +1,4 @@
+﻿Microsoft (R) Build Engine version 17.0.0+c9eb9dd64 for .NET Framework
+Copyright (C) Microsoft Corporation. All rights reserved.
+
+D:\dev\delphi\pythia2\pythia.dproj : error MSB4057: The target "Build" does not exist in the project.

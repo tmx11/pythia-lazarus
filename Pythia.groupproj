@@ -1,0 +1,48 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{9D3E2F4A-7B8C-4E1D-9F2A-8C3D4E5F6A7B}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="PythiaApp.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="pythia.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="PythiaApp">
+        <MSBuild Projects="PythiaApp.dproj"/>
+    </Target>
+    <Target Name="PythiaApp:Clean">
+        <MSBuild Projects="PythiaApp.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="PythiaApp:Make">
+        <MSBuild Projects="PythiaApp.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="pythia">
+        <MSBuild Projects="pythia.dproj"/>
+    </Target>
+    <Target Name="pythia:Clean">
+        <MSBuild Projects="pythia.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="pythia:Make">
+        <MSBuild Projects="pythia.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="PythiaApp;pythia"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="PythiaApp:Clean;pythia:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="PythiaApp:Make;pythia:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>

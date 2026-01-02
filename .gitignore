@@ -1,0 +1,47 @@
+# Delphi Build Outputs
+Win32/
+Win64/
+__history/
+__recovery/
+*.dcu
+*.exe
+*.dll
+*.bpl
+*.dcp
+*.so
+*.apk
+*.drc
+*.map
+*.dres
+*.rsm
+*.tds
+*.dcu
+*.lib
+*.a
+*.o
+*.ocx
+
+# Project Local Files
+*.local
+*.identcache
+*.projdata
+*.tvsconfig
+*.dsk
+*.cbk
+
+# IDE Settings
+*.cfg
+*.err
+
+# Temporary Files
+*.~*
+*.bak
+*.tmp
+
+# OS Files
+Thumbs.db
+.DS_Store
+
+# Packages and Compiled Libraries
+Lib/
+Packages/

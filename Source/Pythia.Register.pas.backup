@@ -1,0 +1,253 @@
+unit Pythia.Register;
+
+interface
+
+procedure Register;
+
+implementation
+
+uses
+  System.SysUtils,
+  System.Classes,
+  System.IOUtils,
+  ToolsAPI,
+  Vcl.Menus,
+  Vcl.Dialogs,
+  Vcl.Forms,
+  Vcl.StdCtrls,
+  Vcl.ExtCtrls,
+  Pythia.ChatForm;
+
+type
+  TPythiaMenuHandler = class
+  public
+    procedure ShowChatWindow(Sender: TObject);
+  end;
+
+var
+  MenuItemChat: TMenuItem;
+  MenuHandler: TPythiaMenuHandler;
+
+procedure ShowCopyableMessage(const ATitle, AMessage: string);
+var
+  Form: TForm;
+  Memo: TMemo;
+  OKButton: TButton;
+begin
+  Form := TForm.Create(nil);
+  try
+    Form.Caption := ATitle;
+    Form.Width := 700;
+    Form.Height := 500;
+    Form.Position := poScreenCenter;
+    Form.BorderStyle := bsDialog;
+    
+    Memo := TMemo.Create(Form);
+    Memo.Parent := Form;
+    Memo.Left := 8;
+    Memo.Top := 8;
+    Memo.Width := Form.ClientWidth - 16;
+    Memo.Height := Form.ClientHeight - 48;
+    Memo.ReadOnly := True;
+    Memo.ScrollBars := ssBoth;
+    Memo.Font.Name := 'Courier New';
+    Memo.Font.Size := 9;
+    Memo.Lines.Text := AMessage;
+    Memo.WordWrap := False;
+    
+    OKButton := TButton.Create(Form);
+    OKButton.Parent := Form;
+    OKButton.Caption := 'OK';
+    OKButton.Width := 75;
+    OKButton.Height := 25;
+    OKButton.Left := (Form.ClientWidth - OKButton.Width) div 2;
+    OKButton.Top := Form.ClientHeight - OKButton.Height - 8;
+    OKButton.ModalResult := 1;  // mrOk
+    OKButton.Default := True;
+    
+    Form.ShowModal;
+  finally
+    Form.Free;
+  end;
+end;
+
+procedure TPythiaMenuHandler.ShowChatWindow(Sender: TObject);
+begin
+  if not Assigned(ChatWindow) then
+    ChatWindow := TChatWindow.Create(nil);
+  
+  ChatWindow.Show;
+end;
+
+
+
+
+
+procedure RegisterMenu;
+var
+  NTAServices: INTAServices;
+  MainMenu: TMainMenu;
+  ToolsMenu: TMenuItem;
+  I, J: Integer;
+  LogFile: string;
+  LogLines: TStringList;
+begin
+  LogFile := TPath.Combine(TPath.GetTempPath, 'pythia_debug.log');
+  LogLines := TStringList.Create;
+  try
+    try
+      LogLines.Add('=== Pythia Registration Debug Log ===');
+      LogLines.Add('Time: ' + DateTimeToStr(Now));
+      LogLines.Add('');
+      
+      NTAServices := BorlandIDEServices as INTAServices;
+      if not Assigned(NTAServices) then
+      begin
+        LogLines.Add('ERROR: NTAServices not available');
+        Exit;
+      end;
+      LogLines.Add('NTAServices: OK');
+      
+      MainMenu := NTAServices.MainMenu;
+      if not Assigned(MainMenu) then
+      begin
+        LogLines.Add('ERROR: MainMenu not available');
+        Exit;
+      end;
+      LogLines.Add('MainMenu: OK, Total top-level menus: ' + IntToStr(MainMenu.Items.Count));
+      LogLines.Add('');
+      
+      // List all top-level menus
+      LogLines.Add('Top-level menus:');
+      for I := 0 to MainMenu.Items.Count - 1 do
+      begin
+        LogLines.Add(Format('  [%d] Name="%s", Caption="%s"', 
+                    [I, MainMenu.Items[I].Name, MainMenu.Items[I].Caption]));
+      end;
+      LogLines.Add('');
+      
+      // Find the Tools menu
+      ToolsMenu := nil;
+      for I := 0 to MainMenu.Items.Count - 1 do
+      begin
+        if (MainMenu.Items[I].Name = 'ToolsMenu') or 
+           (Pos('Tool', MainMenu.Items[I].Caption) > 0) then
+        begin
+          ToolsMenu := MainMenu.Items[I];
+          LogLines.Add('Found Tools menu at index ' + IntToStr(I) + ', Caption: "' + ToolsMenu.Caption + '"');
+          Break;
+        end;
+      end;
+      
+      if not Assigned(ToolsMenu) then
+      begin
+        LogLines.Add('ERROR: Tools menu not found');
+        Exit;
+      end;
+      
+      LogLines.Add('');
+      LogLines.Add('Tools menu BEFORE adding Pythia:');
+      LogLines.Add('Total items: ' + IntToStr(ToolsMenu.Count));
+      for J := 0 to ToolsMenu.Count - 1 do
+      begin
+        LogLines.Add(Format('  [%d] "%s"', [J, ToolsMenu.Items[J].Caption]));
+      end;
+      LogLines.Add('');
+      
+      // Check if Pythia menu already exists (prevent duplicates)
+      for J := 0 to ToolsMenu.Count - 1 do
+      begin
+        if Pos('Pythia', ToolsMenu.Items[J].Caption) > 0 then
+        begin
+          LogLines.Add('Pythia menu already exists at index ' + IntToStr(J));
+          LogLines.Add('Skipping duplicate menu creation');
+          LogLines.Add('SUCCESS: Menu already registered');
+          // Don't exit - let the log save, but skip creation
+          goto SkipCreation;
+        end;
+      end;
+      
+      // Create menu handler
+      if not Assigned(MenuHandler) then
+        MenuHandler := TPythiaMenuHandler.Create;
+      
+      // Add separator
+      MenuItemChat := TMenuItem.Create(ToolsMenu);
+      MenuItemChat.Caption := '-';
+      ToolsMenu.Add(MenuItemChat);
+      
+      // Add Pythia Chat menu item
+      MenuItemChat := TMenuItem.Create(ToolsMenu);
+      MenuItemChat.Caption := 'Pythia AI Chat...';
+      MenuItemChat.Hint := 'Open AI-powered chat assistant';
+      MenuItemChat.ShortCut := TextToShortCut('Ctrl+Alt+P');
+      MenuItemChat.OnClick := MenuHandler.ShowChatWindow;
+      ToolsMenu.Add(MenuItemChat);
+
+      //from https://docwiki.embarcadero.com/RADStudio/Athens/en/Adding_an_Item_to_the_Main_Menu_of_the_IDE
+      //tmx added this part - CRITICAL: This is what actually adds the menu to IDE
+      if Supports(BorlandIDEServices, INTAServices, NTAServices) then
+      begin
+        NTAServices.AddActionMenu('ToolsMenu', nil, MenuItemChat);
+
+        existingMenuItems := NTAServices.ActionList();
+
+      end;
+
+      SkipCreation:
+
+      LogLines.Add('Tools menu AFTER adding Pythia:');
+      LogLines.Add('Total items: ' + IntToStr(ToolsMenu.Count));
+      for J := 0 to ToolsMenu.Count - 1 do
+      begin
+        LogLines.Add(Format('  [%d] "%s"', [J, ToolsMenu.Items[J].Caption]));
+      end;
+      LogLines.Add('');
+      LogLines.Add('Our menu item details:');
+      LogLines.Add('  Index: ' + IntToStr(ToolsMenu.IndexOf(MenuItemChat)));
+      LogLines.Add('  Caption: "' + MenuItemChat.Caption + '"');
+      LogLines.Add('  Visible: ' + BoolToStr(MenuItemChat.Visible, True));
+      LogLines.Add('  Enabled: ' + BoolToStr(MenuItemChat.Enabled, True));
+      LogLines.Add('');
+      LogLines.Add('SUCCESS: Pythia registered');
+      
+    except
+      on E: Exception do
+      begin
+        LogLines.Add('');
+        LogLines.Add('EXCEPTION: ' + E.ClassName + ' - ' + E.Message);
+      end;
+    end;
+  finally
+    LogLines.SaveToFile(LogFile);
+    //tmx comment out the popup for now
+    //ShowCopyableMessage('Pythia Registration Debug', LogLines.Text);
+    LogLines.Free;
+  end;
+end;
+
+procedure UnregisterMenu;
+begin
+  if Assigned(MenuItemChat) then
+  begin
+    MenuItemChat.Free;
+    MenuItemChat := nil;
+  end;
+end;
+
+procedure Register;
+begin
+  RegisterMenu;
+end;
+
+initialization
+  RegisterMenu;
+
+finalization
+  UnregisterMenu;
+  if Assigned(ChatWindow) then
+    ChatWindow.Free;
+  if Assigned(MenuHandler) then
+    MenuHandler.Free;
+
+end.

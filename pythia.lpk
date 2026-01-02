@@ -1,0 +1,75 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<CONFIG>
+  <Package Version="5">
+    <PathDelim Value="\"/>
+    <Name Value="pythia"/>
+    <Type Value="DesignTime"/>
+    <Author Value="Pythia AI Assistant"/>
+    <CompilerOptions>
+      <Version Value="11"/>
+      <PathDelim Value="\"/>
+      <SearchPaths>
+        <IncludeFiles Value="Source"/>
+        <OtherUnitFiles Value="Source"/>
+        <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
+      </SearchPaths>
+      <Parsing>
+        <SyntaxOptions>
+          <SyntaxMode Value="Delphi"/>
+          <CStyleOperator Value="False"/>
+          <AllowLabel Value="False"/>
+        </SyntaxOptions>
+      </Parsing>
+    </CompilerOptions>
+    <Description Value="Pythia AI Chat - Delphi programming assistant with AI models"/>
+    <Version Major="1"/>
+    <Files Count="7">
+      <Item1>
+        <Filename Value="Source\Pythia.Register.pas"/>
+        <HasRegisterProc Value="True"/>
+        <UnitName Value="Pythia.Register"/>
+      </Item1>
+      <Item2>
+        <Filename Value="Source\Pythia.ChatForm.pas"/>
+        <UnitName Value="Pythia.ChatForm"/>
+      </Item2>
+      <Item3>
+        <Filename Value="Source\Pythia.Config.pas"/>
+        <UnitName Value="Pythia.Config"/>
+      </Item3>
+      <Item4>
+        <Filename Value="Source\Pythia.Context.pas"/>
+        <UnitName Value="Pythia.Context"/>
+      </Item4>
+      <Item5>
+        <Filename Value="Source\Pythia.AI.Client.pas"/>
+        <UnitName Value="Pythia.AI.Client"/>
+      </Item5>
+      <Item6>
+        <Filename Value="Source\Pythia.GitHub.Auth.pas"/>
+        <UnitName Value="Pythia.GitHub.Auth"/>
+      </Item6>
+      <Item7>
+        <Filename Value="Source\Pythia.SettingsForm.pas"/>
+        <UnitName Value="Pythia.SettingsForm"/>
+      </Item7>
+    </Files>
+    <RequiredPkgs Count="3">
+      <Item1>
+        <PackageName Value="IDEIntf"/>
+      </Item1>
+      <Item2>
+        <PackageName Value="LCL"/>
+      </Item2>
+      <Item3>
+        <PackageName Value="FCL"/>
+      </Item3>
+    </RequiredPkgs>
+    <UsageOptions>
+      <UnitPath Value="$(PkgOutDir)"/>
+    </UsageOptions>
+    <PublishOptions>
+      <Version Value="2"/>
+    </PublishOptions>
+  </Package>
+</CONFIG>

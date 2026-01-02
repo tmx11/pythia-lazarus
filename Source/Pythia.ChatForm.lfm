@@ -1,0 +1,63 @@
+object ChatWindow: TChatWindow
+  Left = 500
+  Height = 500
+  Top = 200
+  Width = 600
+  Caption = 'Pythia AI Chat'
+  ClientHeight = 500
+  ClientWidth = 600
+  OnCreate = FormCreate
+  LCLVersion = '3.2.0.0'
+  object MemoChat: TMemo
+    Left = 0
+    Height = 380
+    Top = 0
+    Width = 600
+    Align = alClient
+    ReadOnly = True
+    ScrollBars = ssAutoBoth
+    TabOrder = 0
+  end
+  object PanelInput: TPanel
+    Left = 0
+    Height = 120
+    Top = 380
+    Width = 600
+    Align = alBottom
+    ClientHeight = 120
+    ClientWidth = 600
+    TabOrder = 1
+    object LabelModel: TLabel
+      Left = 8
+      Height = 15
+      Top = 8
+      Width = 37
+      Caption = 'Model:'
+    end
+    object ComboModel: TComboBox
+      Left = 56
+      Height = 23
+      Top = 5
+      Width = 200
+      ItemHeight = 15
+      TabOrder = 0
+      Text = 'GPT-4'
+    end
+    object MemoInput: TMemo
+      Left = 8
+      Height = 60
+      Top = 35
+      Width = 490
+      TabOrder = 1
+    end
+    object ButtonSend: TButton
+      Left = 505
+      Height = 25
+      Top = 35
+      Width = 85
+      Caption = 'Send'
+      OnClick = ButtonSendClick
+      TabOrder = 2
+    end
+  end
+end

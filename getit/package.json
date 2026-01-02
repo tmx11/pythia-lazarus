@@ -1,0 +1,33 @@
+{
+  "category": "RAD Studio IDE Plugins",
+  "description": "AI-powered chat assistant for Delphi IDE with support for GPT-4 and Claude models",
+  "id": "Pythia.AIChat",
+  "license": "MIT",
+  "name": "Pythia - AI Copilot Chat",
+  "platforms": ["Win32", "Win64"],
+  "products": ["Delphi"],
+  "version": "1.0.0",
+  "author": "Pythia Development Team",
+  "homepage": "https://github.com/yourusername/pythia",
+  "package-url": "https://github.com/yourusername/pythia/releases/latest/download/pythia-getit.zip",
+  "requirements": {
+    "minimum-delphi-version": "12.0"
+  },
+  "installation": {
+    "type": "bpl",
+    "files": [
+      {
+        "source": "Win32/Debug/pythia.bpl",
+        "destination": "$BPL$",
+        "platforms": ["Win32"]
+      }
+    ],
+    "register-packages": [
+      {
+        "file": "$BPL$/pythia.bpl",
+        "description": "Pythia - AI Copilot Chat for Delphi IDE"
+      }
+    ]
+  },
+  "readme": "# Pythia - AI Copilot Chat\n\nAI-powered chat assistant integrated directly into the Delphi IDE.\n\n## Features\n- Chat with GPT-4 or Claude AI models\n- Delphi-specific programming assistance\n- Accessible via Tools menu or Ctrl+Alt+P\n\n## Setup\n1. After installation, open Tools > Pythia AI Chat\n2. Click Settings to enter your OpenAI or Anthropic API key\n3. Start chatting!\n\n## API Keys\nGet your keys from:\n- OpenAI: https://platform.openai.com/api-keys\n- Anthropic: https://console.anthropic.com/settings/keys"
+}

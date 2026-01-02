@@ -1,0 +1,54 @@
+unit Pythia.Register;
+
+interface
+
+uses
+  SysUtils, Classes, Forms, Dialogs,
+  LazIDEIntf, IDEWindowIntf, IDECommands, MenuIntf;
+
+procedure Register;
+
+implementation
+
+uses
+  Pythia.ChatForm;
+
+var
+  PythiaChatCreator: TIDEWindowCreator;
+
+procedure CreatePythiaChat(Sender: TObject; aFormName: string; var AForm: TCustomForm; DoDisableAutoSizing: boolean);
+begin
+  if AForm = nil then
+    IDEWindowCreators.CreateForm(AForm, TChatWindow, DoDisableAutoSizing, LazarusIDE.OwningComponent);
+end;
+
+procedure ShowPythiaChat(Sender: TObject);
+begin
+  IDEWindowCreators.ShowForm('PythiaChatWindow', true);
+end;
+
+procedure Register;
+var
+  CmdCat: TIDECommandCategory;
+  Cmd: TIDECommand;
+begin
+  // Register dockable window
+  PythiaChatCreator := IDEWindowCreators.Add('PythiaChatWindow');
+  PythiaChatCreator.OnCreateFormProc := @CreatePythiaChat;
+  PythiaChatCreator.OnGetLayout := nil;
+  PythiaChatCreator.OnSetLayout := nil;
+  PythiaChatCreator.CreateSimpleLayout;
+  
+  // Add menu command
+  CmdCat := IDECommandList.FindCategoryByName('ViewMenu');
+  if CmdCat = nil then
+    CmdCat := IDECommandList.CreateCategory(nil, 'ViewMenu', 'View Menu', IDECmdScopeSrcEditOnly);
+    
+  Cmd := RegisterIDECommand(CmdCat, 'PythiaAIChat', 'Pythia AI Chat', 
+    CleanIDEShortCut, CleanIDEShortCut, @ShowPythiaChat, nil);
+    
+  RegisterIDEMenuCommand(itmViewIDEInternalsWindows, 'PythiaChatMenu', 
+    'Pythia AI Chat', nil, @ShowPythiaChat, Cmd, 'Ctrl+Shift+P');
+end;
+
+end.

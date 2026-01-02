@@ -1,0 +1,29 @@
+﻿Checking project dependencies...
+Building pythia.dproj (Debug, Win32)
+brcc32 command line for "pythia.vrc"
+  d:\program files (x86)\embarcadero\studio\23.0\bin\cgrc.exe -c65001 pythia.vrc -fopythia.res 
+dcc32 command line for "pythia.dpk"
+  d:\program files (x86)\embarcadero\studio\23.0\bin\dcc32.exe -$O- -$W+ -$R+ -$Q+ --no-config -B -Q -TX.bpl 
+  -AGenerics.Collections=System.Generics.Collections;Generics.Defaults=System.Generics.Defaults;WinTypes=Winapi.Windows;WinProcs=Winapi.Windows;
+  DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE -DDEBUG -E.\Win32\Debug -I"d:\program files (x86)\embarcadero\studio\23.0\lib\Win32\debug";"d:\program files 
+  (x86)\embarcadero\studio\23.0\lib\Win32\release";C:\Users\tmx\Documents\Embarcadero\Studio\23.0\Imports;
+  C:\Users\tmx\Documents\Embarcadero\Studio\23.0\Imports\Win32;"d:\program files (x86)\embarcadero\studio\23.0\Imports";
+  C:\Users\Public\Documents\Embarcadero\Studio\23.0\Dcp;"d:\program files (x86)\embarcadero\studio\23.0\include";
+  C:\Users\tmx\Documents\Embarcadero\Studio\23.0\CatalogRepository\DelphiAIDeveloper\Src -LEC:\Users\Public\Documents\Embarcadero\Studio\23.0\Bpl 
+  -LNC:\Users\Public\Documents\Embarcadero\Studio\23.0\Dcp -NU.\Win32\Debug -NSWinapi;System.Win;Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;Bde;
+  System;Xml;Data;Datasnap;Web;Soap; -O"d:\program files (x86)\embarcadero\studio\23.0\lib\Win32\release";
+  C:\Users\tmx\Documents\Embarcadero\Studio\23.0\Imports;C:\Users\tmx\Documents\Embarcadero\Studio\23.0\Imports\Win32;"d:\program files 
+  (x86)\embarcadero\studio\23.0\Imports";C:\Users\Public\Documents\Embarcadero\Studio\23.0\Dcp;"d:\program files (x86)\embarcadero\studio\23.0\include";
+  C:\Users\tmx\Documents\Embarcadero\Studio\23.0\CatalogRepository\DelphiAIDeveloper\Src -R"d:\program files 
+  (x86)\embarcadero\studio\23.0\lib\Win32\release";C:\Users\tmx\Documents\Embarcadero\Studio\23.0\Imports;
+  C:\Users\tmx\Documents\Embarcadero\Studio\23.0\Imports\Win32;"d:\program files (x86)\embarcadero\studio\23.0\Imports";
+  C:\Users\Public\Documents\Embarcadero\Studio\23.0\Dcp;"d:\program files (x86)\embarcadero\studio\23.0\include";
+  C:\Users\tmx\Documents\Embarcadero\Studio\23.0\CatalogRepository\DelphiAIDeveloper\Src -U"d:\program files 
+  (x86)\embarcadero\studio\23.0\lib\Win32\debug";"d:\program files (x86)\embarcadero\studio\23.0\lib\Win32\release";
+  C:\Users\tmx\Documents\Embarcadero\Studio\23.0\Imports;C:\Users\tmx\Documents\Embarcadero\Studio\23.0\Imports\Win32;"d:\program files 
+  (x86)\embarcadero\studio\23.0\Imports";C:\Users\Public\Documents\Embarcadero\Studio\23.0\Dcp;"d:\program files (x86)\embarcadero\studio\23.0\include";
+  C:\Users\tmx\Documents\Embarcadero\Studio\23.0\CatalogRepository\DelphiAIDeveloper\Src -V -VN -JL 
+  -NBC:\Users\Public\Documents\Embarcadero\Studio\23.0\Dcp -NHC:\Users\Public\Documents\Embarcadero\Studio\23.0\hpp\Win32 
+  -NOC:\Users\Public\Documents\Embarcadero\Studio\23.0\Dcp  pythia.dpk   
+Success
+Elapsed time: 00:00:02.2
