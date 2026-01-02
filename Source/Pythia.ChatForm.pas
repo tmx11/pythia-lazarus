@@ -68,7 +68,7 @@ begin
   
   // Setup status panel
   PanelStatus.Align := alTop;
-  PanelStatus.Height := 28;
+  PanelStatus.Height := 50;
   
   // Update all status elements
   UpdateStatusBar;

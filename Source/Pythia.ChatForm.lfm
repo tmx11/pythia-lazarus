@@ -10,48 +10,52 @@ object ChatWindow: TChatWindow
   LCLVersion = '3.2.0.0'
   object PanelStatus: TPanel
     Left = 0
-    Height = 28
+    Height = 50
     Top = 0
     Width = 600
     Align = alTop
-    ClientHeight = 28
+    ClientHeight = 50
     ClientWidth = 600
     TabOrder = 0
     object LabelVersion: TLabel
       Left = 4
       Height = 15
-      Top = 6
-      Width = 80
+      Top = 4
+      Width = 200
+      AutoSize = False
       Caption = 'Pythia v1.0.3'
       Font.Style = [fsBold]
       ParentFont = False
     end
     object LabelGitBranch: TLabel
-      Left = 90
+      Left = 4
       Height = 15
-      Top = 6
-      Width = 80
+      Top = 22
+      Width = 200
+      AutoSize = False
       Caption = 'Branch: main'
     end
     object LabelCurrentFile: TLabel
-      Left = 180
+      Left = 210
       Height = 15
-      Top = 6
-      Width = 80
+      Top = 4
+      Width = 270
+      AutoSize = False
       Caption = 'File: (none)'
     end
     object LabelStats: TLabel
-      Left = 280
+      Left = 210
       Height = 15
-      Top = 6
-      Width = 150
+      Top = 22
+      Width = 270
+      AutoSize = False
       Caption = 'Messages: 0 | Tokens: 0'
       Font.Color = clGray
       ParentFont = False
     end
     object ButtonRefreshContext: TButton
       Left = 490
-      Height = 22
+      Height = 44
       Top = 3
       Width = 100
       Caption = 'Refresh'
@@ -61,8 +65,8 @@ object ChatWindow: TChatWindow
   end
   object MemoChat: TMemo
     Left = 0
-    Height = 352
-    Top = 28
+    Height = 330
+    Top = 50
     Width = 600
     Align = alClient
     ReadOnly = True
