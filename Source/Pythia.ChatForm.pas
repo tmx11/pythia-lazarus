@@ -103,7 +103,7 @@ begin
   
   FIsProcessing := False;
   
-  AddMessage('assistant', 'Hello! I''m Pythia, your AI coding assistant for Delphi. How can I help you today?');
+  AddMessage('assistant', 'Hello! I''m Pythia, your AI coding assistant for Lazarus and Free Pascal. How can I help you today?');
   UpdateStats;
 end;
 
