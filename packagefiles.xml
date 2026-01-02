@@ -5,155 +5,155 @@
       <Name Value="pythia"/>
       <Version Major="1"/>
       <Filename Value="D:\dev\delphi\pythia-lazarus\pythia.lpk"/>
-      <LastUsed Value="2026/01/01 22:41:20"/>
+      <LastUsed Value="2026/01/01 22:58:47"/>
     </Item1>
   </UserPkgLinks>
   <GlobalPkgLinks Version="3" Count="30">
     <Item1>
       <Name Value="anchordocking"/>
       <Version Major="1"/>
-      <LastUsed Value="2026/01/01 22:40:27"/>
+      <LastUsed Value="2026/01/01 22:41:47"/>
     </Item1>
     <Item2>
       <Name Value="anchordockingdsgn"/>
       <Version Major="1"/>
-      <LastUsed Value="2026/01/01 22:40:27"/>
+      <LastUsed Value="2026/01/01 22:41:47"/>
     </Item2>
     <Item3>
       <Name Value="buildintf"/>
       <Version Major="1"/>
-      <LastUsed Value="2026/01/01 22:41:20"/>
+      <LastUsed Value="2026/01/01 22:58:47"/>
     </Item3>
     <Item4>
       <Name Value="cmdlinedebuggerbase"/>
-      <LastUsed Value="2026/01/01 22:41:20"/>
+      <LastUsed Value="2026/01/01 22:58:47"/>
     </Item4>
     <Item5>
       <Name Value="codetools"/>
       <Version Major="1" Release="1"/>
-      <LastUsed Value="2026/01/01 22:41:20"/>
+      <LastUsed Value="2026/01/01 22:58:47"/>
     </Item5>
     <Item6>
       <Name Value="debuggerintf"/>
       <Version Minor="1"/>
-      <LastUsed Value="2026/01/01 22:41:20"/>
+      <LastUsed Value="2026/01/01 22:58:47"/>
     </Item6>
     <Item7>
       <Name Value="fcl"/>
       <Version Major="1" Release="1"/>
-      <LastUsed Value="2026/01/01 22:41:20"/>
+      <LastUsed Value="2026/01/01 22:58:47"/>
     </Item7>
     <Item8>
       <Name Value="fpdebug"/>
       <Version Major="1"/>
-      <LastUsed Value="2026/01/01 22:41:20"/>
+      <LastUsed Value="2026/01/01 22:58:47"/>
     </Item8>
     <Item9>
       <Name Value="freetypelaz"/>
       <Version Major="1"/>
-      <LastUsed Value="2026/01/01 22:41:20"/>
+      <LastUsed Value="2026/01/01 22:58:47"/>
     </Item9>
     <Item10>
       <Name Value="ideconfig"/>
       <Version Major="1"/>
-      <LastUsed Value="2026/01/01 22:41:20"/>
+      <LastUsed Value="2026/01/01 22:58:47"/>
     </Item10>
     <Item11>
       <Name Value="idedebugger"/>
       <Version Release="1"/>
-      <LastUsed Value="2026/01/01 22:41:20"/>
+      <LastUsed Value="2026/01/01 22:58:47"/>
     </Item11>
     <Item12>
       <Name Value="ideintf"/>
       <Version Major="1"/>
-      <LastUsed Value="2026/01/01 22:41:20"/>
+      <LastUsed Value="2026/01/01 22:58:47"/>
     </Item12>
     <Item13>
       <Name Value="idepackager"/>
       <Version Major="1"/>
-      <LastUsed Value="2026/01/01 22:41:20"/>
+      <LastUsed Value="2026/01/01 22:58:47"/>
     </Item13>
     <Item14>
       <Name Value="ideproject"/>
       <Version Major="1"/>
-      <LastUsed Value="2026/01/01 22:41:20"/>
+      <LastUsed Value="2026/01/01 22:58:47"/>
     </Item14>
     <Item15>
       <Name Value="ideutilspkg"/>
       <Version Major="1"/>
-      <LastUsed Value="2026/01/01 22:41:20"/>
+      <LastUsed Value="2026/01/01 22:58:47"/>
     </Item15>
     <Item16>
       <Name Value="laz.virtualtreeview_package"/>
       <Version Major="5" Minor="5" Release="3" Build="1"/>
-      <LastUsed Value="2026/01/01 22:41:20"/>
+      <LastUsed Value="2026/01/01 22:58:47"/>
     </Item16>
     <Item17>
       <Name Value="lazcontroldsgn"/>
-      <LastUsed Value="2026/01/01 22:41:20"/>
+      <LastUsed Value="2026/01/01 22:58:47"/>
     </Item17>
     <Item18>
       <Name Value="lazcontrols"/>
       <Version Major="1" Release="1"/>
-      <LastUsed Value="2026/01/01 22:41:20"/>
+      <LastUsed Value="2026/01/01 22:58:47"/>
     </Item18>
     <Item19>
       <Name Value="lazdebuggerfp"/>
       <Version Major="1"/>
-      <LastUsed Value="2026/01/01 22:41:20"/>
+      <LastUsed Value="2026/01/01 22:58:47"/>
     </Item19>
     <Item20>
       <Name Value="lazdebuggerfplldb"/>
-      <LastUsed Value="2026/01/01 22:41:20"/>
+      <LastUsed Value="2026/01/01 22:58:47"/>
     </Item20>
     <Item21>
       <Name Value="lazdebuggergdbmi"/>
       <Version Minor="1"/>
-      <LastUsed Value="2026/01/01 22:41:20"/>
+      <LastUsed Value="2026/01/01 22:58:47"/>
     </Item21>
     <Item22>
       <Name Value="lazdebuggerintf"/>
       <Version Release="1"/>
-      <LastUsed Value="2026/01/01 22:41:20"/>
+      <LastUsed Value="2026/01/01 22:58:47"/>
     </Item22>
     <Item23>
       <Name Value="lazdebuggerlldb"/>
-      <LastUsed Value="2026/01/01 22:41:20"/>
+      <LastUsed Value="2026/01/01 22:58:47"/>
     </Item23>
     <Item24>
       <Name Value="lazedit"/>
       <Version Major="1"/>
-      <LastUsed Value="2026/01/01 22:41:20"/>
+      <LastUsed Value="2026/01/01 22:58:47"/>
     </Item24>
     <Item25>
       <Name Value="lazutils"/>
       <Version Major="1"/>
-      <LastUsed Value="2026/01/01 22:41:20"/>
+      <LastUsed Value="2026/01/01 22:58:47"/>
     </Item25>
     <Item26>
       <Name Value="lcl"/>
       <Version Major="4" Minor="4"/>
-      <LastUsed Value="2026/01/01 22:41:20"/>
+      <LastUsed Value="2026/01/01 22:58:47"/>
     </Item26>
     <Item27>
       <Name Value="lclbase"/>
       <Version Major="4" Minor="4"/>
-      <LastUsed Value="2026/01/01 22:41:20"/>
+      <LastUsed Value="2026/01/01 22:58:47"/>
     </Item27>
     <Item28>
       <Name Value="lclextensions_package"/>
       <Version Minor="6" Release="1"/>
-      <LastUsed Value="2026/01/01 22:41:20"/>
+      <LastUsed Value="2026/01/01 22:58:47"/>
     </Item28>
     <Item29>
       <Name Value="synedit"/>
       <Version Major="1"/>
-      <LastUsed Value="2026/01/01 22:41:20"/>
+      <LastUsed Value="2026/01/01 22:58:47"/>
     </Item29>
     <Item30>
       <Name Value="syneditdsgn"/>
       <Version Major="1"/>
-      <LastUsed Value="2026/01/01 22:40:27"/>
+      <LastUsed Value="2026/01/01 22:41:47"/>
     </Item30>
   </GlobalPkgLinks>
 </CONFIG>
