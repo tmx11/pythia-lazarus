@@ -5,7 +5,7 @@
 interface
 
 uses
-  Classes, SysUtils, Forms, IDEWindowIntf;
+  Classes, SysUtils, Forms, IDEWindowIntf, MenuIntf;
 
 procedure Register;
 
@@ -23,17 +23,26 @@ begin
   // Only create if not already exists
   if AForm <> nil then Exit;
   
-  // Create form - DO NOT assign parent/owner yet
+  // Create form
   AForm := TChatWindow.Create(nil);
   AForm.Name := aFormName;
 end;
 
+procedure ShowPythiaChatWindow(Sender: TObject);
+begin
+  IDEWindowCreators.ShowForm('PythiaChatWindow', true);
+end;
+
 procedure Register;
 begin
-  // Simple registration - no menu, just window creator
+  // Register dockable window
   PythiaChatCreator := IDEWindowCreators.Add('PythiaChatWindow');
   PythiaChatCreator.OnCreateFormProc := @CreatePythiaChatWindow;
   PythiaChatCreator.CreateSimpleLayout;
+  
+  // Add to View -> IDE Internals menu
+  RegisterIDEMenuCommand(itmViewIDEInternalsWindows, 'mnuPythiaChat', 
+    'Pythia AI Chat', nil, @ShowPythiaChatWindow);
 end;
 
 end.
