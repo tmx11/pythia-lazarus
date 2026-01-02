@@ -9,7 +9,7 @@ uses
   StdCtrls, ComCtrls, ExtCtrls, Process, Pythia.AI.Client, Pythia.MarkdownMemo;
 
 const
-  PYTHIA_VERSION = 'v1.0.3-20260102';
+  PYTHIA_VERSION = 'v1.1.0-20260102';
 
 type
   TChatWindow = class(TForm)
