@@ -6,14 +6,14 @@ interface
 
 uses
   LCLIntf, LCLType, Classes, SysUtils, Forms, Controls, Graphics, Dialogs,
-  StdCtrls, ComCtrls, ExtCtrls, Process, Pythia.AI.Client;
+  StdCtrls, ComCtrls, ExtCtrls, Process, Pythia.AI.Client, Pythia.MarkdownMemo;
 
 const
   PYTHIA_VERSION = 'v1.0.3-20260102';
 
 type
   TChatWindow = class(TForm)
-    MemoChat: TMemo;
+    MemoChat: TMarkdownMemo;
     PanelStatus: TPanel;
     LabelVersion: TLabel;
     LabelGitBranch: TLabel;
@@ -326,7 +326,13 @@ begin
   end;
   
   MemoChat.Lines.Add('');
-  MemoChat.Lines.Add(Prefix + DisplayContent);
+  
+  // Set markdown rendering mode
+  MemoChat.RenderMarkdown := CheckBoxRenderMarkdown.Checked;
+  
+  // Add message with prefix
+  MemoChat.AddMarkdownText(Prefix + DisplayContent);
+  
   MemoChat.Lines.Add('');
   
   // Update stats after adding message
