@@ -14,10 +14,12 @@ type
     PanelInput: TPanel;
     MemoInput: TMemo;
     ButtonSend: TButton;
+    ButtonSettings: TButton;
     ComboModel: TComboBox;
     LabelModel: TLabel;
     procedure FormCreate(Sender: TObject);
     procedure ButtonSendClick(Sender: TObject);
+    procedure ButtonSettingsClick(Sender: TObject);
     procedure MemoInputKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
   private
     FMessages: TArray<TChatMessage>;
@@ -33,7 +35,7 @@ var
 implementation
 
 uses
-  Pythia.Config;
+  Pythia.Config, Pythia.SettingsForm;
 
 {$R *.lfm}
 
@@ -75,6 +77,11 @@ begin
   AddMessage('assistant', 'Hello! I''m Pythia, your AI coding assistant for Delphi. How can I help you today?');
 end;
 
+procedure TChatWindow.ButtonSettingsClick(Sender: TObject);
+begin
+  TSettingsForm.Execute;
+end;
+
 procedure TChatWindow.ButtonSendClick(Sender: TObject);
 begin
   if FIsProcessing or (Trim(MemoInput.Text) = '') then
@@ -85,12 +92,13 @@ end;
 
 procedure TChatWindow.MemoInputKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
 begin
-  // Shift+Enter sends the message
-  if (Key = VK_RETURN) and (ssShift in Shift) then
+  // Enter without Shift = Send message
+  if (Key = VK_RETURN) and (Shift = []) then
   begin
     Key := 0; // Consume the key
     ButtonSendClick(nil);
   end;
+  // Shift+Enter = New line (default behavior, don't intercept)
 end;
 
 procedure TChatWindow.AddMessage(const Role, Content: string);

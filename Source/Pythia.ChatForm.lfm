@@ -59,5 +59,14 @@ object ChatWindow: TChatWindow
       OnClick = ButtonSendClick
       TabOrder = 2
     end
+    object ButtonSettings: TButton
+      Left = 505
+      Height = 25
+      Top = 65
+      Width = 85
+      Caption = 'Settings'
+      OnClick = ButtonSettingsClick
+      TabOrder = 3
+    end
   end
 end
