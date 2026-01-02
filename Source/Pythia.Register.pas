@@ -5,7 +5,7 @@
 interface
 
 uses
-  Classes, SysUtils, Forms, Controls, MenuIntf, LazIDEIntf, IDEWindowIntf, IDECommands;
+  Classes, SysUtils, Forms, IDEWindowIntf;
 
 procedure Register;
 
@@ -14,34 +14,26 @@ implementation
 uses
   Pythia.ChatForm;
 
-const
-  PythiaChatWindowName = 'PythiaChatWindow';
-
 var
   PythiaChatCreator: TIDEWindowCreator;
 
 procedure CreatePythiaChatWindow(Sender: TObject; aFormName: string; 
   var AForm: TCustomForm; DoDisableAutoSizing: boolean);
 begin
-  if AForm = nil then
-  begin
-    AForm := TChatWindow.Create(nil);  // Use nil instead of Application
-    AForm.Name := aFormName;
-  end;
+  // Only create if not already exists
+  if AForm <> nil then Exit;
+  
+  // Create form - DO NOT assign parent/owner yet
+  AForm := TChatWindow.Create(nil);
+  AForm.Name := aFormName;
 end;
 
 procedure Register;
 begin
-  // Register as dockable IDE window - minimal registration
-  if IDEWindowCreators <> nil then
-  begin
-    PythiaChatCreator := IDEWindowCreators.Add(PythiaChatWindowName);
-    if PythiaChatCreator <> nil then
-    begin
-      PythiaChatCreator.OnCreateFormProc := @CreatePythiaChatWindow;
-      PythiaChatCreator.CreateSimpleLayout;
-    end;
-  end;
+  // Simple registration - no menu, just window creator
+  PythiaChatCreator := IDEWindowCreators.Add('PythiaChatWindow');
+  PythiaChatCreator.OnCreateFormProc := @CreatePythiaChatWindow;
+  PythiaChatCreator.CreateSimpleLayout;
 end;
 
 end.
