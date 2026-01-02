@@ -72,7 +72,7 @@ object ChatWindow: TChatWindow
       TabOrder = 1
     end
   end
-  object ChatDisplay: TSynEdit
+  object ChatDisplay: TMemo
     Left = 0
     Height = 330
     Top = 50
@@ -85,6 +85,7 @@ object ChatWindow: TChatWindow
     ParentFont = False
     ReadOnly = True
     ScrollBars = ssAutoBoth
+    WordWrap = True
     TabOrder = 1
   end
   object PanelInput: TPanel

@@ -6,14 +6,14 @@ interface
 
 uses
   LCLIntf, LCLType, Classes, SysUtils, Forms, Controls, Graphics, Dialogs,
-  StdCtrls, ComCtrls, ExtCtrls, Process, SynEdit, Pythia.AI.Client;
+  StdCtrls, ComCtrls, ExtCtrls, Process, Pythia.AI.Client;
 
 const
   PYTHIA_VERSION = 'v1.2.0-20260102';
 
 type
   TChatWindow = class(TForm)
-    ChatDisplay: TSynEdit;
+    ChatDisplay: TMemo;
     PanelStatus: TPanel;
     LabelVersion: TLabel;
     LabelGitBranch: TLabel;
@@ -75,14 +75,14 @@ begin
   // Update all status elements
   UpdateStatusBar;
   
-  // Setup chat display (TSynEdit)
+  // Setup chat display (TMemo)
   ChatDisplay.Align := alClient;
   ChatDisplay.ReadOnly := True;
   ChatDisplay.ScrollBars := ssAutoBoth;
   ChatDisplay.Font.Name := 'Consolas';
   ChatDisplay.Font.Size := 10;
   ChatDisplay.Color := clWhite;
-  ChatDisplay.Gutter.Visible := False;  // No line numbers for chat
+  ChatDisplay.WordWrap := True;  // Enable word wrap
   
   // Setup input panel
   PanelInput.Align := alBottom;
@@ -292,7 +292,11 @@ procedure TChatWindow.AddMessage(const Role, Content: string);
 var
   Prefix: string;
   Msg: TChatMessage;
-  DisplayContent: string;
+  DisplayContent, FullText: string;
+  Lines: TStringList;
+  InCodeBlock: Boolean;
+  Line: string;
+  I: Integer;
 begin
   // Add to message history
   Msg.Role := Role;
@@ -301,15 +305,15 @@ begin
   SetLength(FMessages, Length(FMessages) + 1);
   FMessages[High(FMessages)] := Msg;
   
-  // Display in chat
+  // Determine prefix with clear visual distinction
   if Role = 'user' then
   begin
-    Prefix := '>>> YOU: ';
+    Prefix := '[USER] ';  // Blue marker for user
     DisplayContent := Content;
   end
   else if Role = 'assistant' then
   begin
-    Prefix := '<<< AI: ';
+    Prefix := '[AI] ';
     // Only render markdown if checkbox is enabled
     if CheckBoxRenderMarkdown.Checked then
       DisplayContent := RenderMarkdown(Content)
@@ -318,7 +322,7 @@ begin
   end
   else if Role = 'system' then
   begin
-    Prefix := '=== ';
+    Prefix := '[SYSTEM] ';
     DisplayContent := Content;
   end
   else
@@ -327,12 +331,46 @@ begin
     DisplayContent := Content;
   end;
   
+  // Build full text with code block formatting
+  Lines := TStringList.Create;
+  try
+    Lines.Text := DisplayContent;
+    InCodeBlock := False;
+    FullText := Prefix;
+    
+    for I := 0 to Lines.Count - 1 do
+    begin
+      Line := Lines[I];
+      
+      // Detect code block markers
+      if (Length(Line) >= 3) and (Copy(Line, 1, 3) = '```') then
+      begin
+        InCodeBlock := not InCodeBlock;
+        if I > 0 then FullText := FullText + #13#10;
+        FullText := FullText + Line;
+      end
+      else if InCodeBlock then
+      begin
+        if I > 0 then FullText := FullText + #13#10;
+        FullText := FullText + '    ' + Line;  // Indent code blocks
+      end
+      else
+      begin
+        if I > 0 then FullText := FullText + #13#10;
+        FullText := FullText + Line;
+      end;
+    end;
+  finally
+    Lines.Free;
+  end;
+  
+  // Add blank line, message, and another blank line
+  ChatDisplay.Lines.Add('');
+  ChatDisplay.Lines.Add(FullText);
   ChatDisplay.Lines.Add('');
   
-  // Add message to SynEdit
-  ChatDisplay.Lines.Add(Prefix + DisplayContent);
-  
-  ChatDisplay.Lines.Add('');
+  // Scroll to bottom
+  ChatDisplay.SelStart := Length(ChatDisplay.Text);
   
   // Update stats after adding message
   UpdateStats;
