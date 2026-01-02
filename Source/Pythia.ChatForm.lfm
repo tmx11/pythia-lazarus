@@ -72,12 +72,17 @@ object ChatWindow: TChatWindow
       TabOrder = 1
     end
   end
-  object MemoChat: TMemo
+  object ChatDisplay: TSynEdit
     Left = 0
     Height = 330
     Top = 50
     Width = 600
     Align = alClient
+    Font.Height = -13
+    Font.Name = 'Consolas'
+    Font.Pitch = fpFixed
+    ParentColor = False
+    ParentFont = False
     ReadOnly = True
     ScrollBars = ssAutoBoth
     TabOrder = 1

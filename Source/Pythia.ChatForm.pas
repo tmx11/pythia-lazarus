@@ -6,14 +6,14 @@ interface
 
 uses
   LCLIntf, LCLType, Classes, SysUtils, Forms, Controls, Graphics, Dialogs,
-  StdCtrls, ComCtrls, ExtCtrls, Process, Pythia.AI.Client, Pythia.MarkdownMemo;
+  StdCtrls, ComCtrls, ExtCtrls, Process, SynEdit, Pythia.AI.Client;
 
 const
-  PYTHIA_VERSION = 'v1.1.0-20260102';
+  PYTHIA_VERSION = 'v1.2.0-20260102';
 
 type
   TChatWindow = class(TForm)
-    MemoChat: TMarkdownMemo;
+    ChatDisplay: TSynEdit;
     PanelStatus: TPanel;
     LabelVersion: TLabel;
     LabelGitBranch: TLabel;
@@ -75,12 +75,14 @@ begin
   // Update all status elements
   UpdateStatusBar;
   
-  // Setup chat display
-  MemoChat.Align := alClient;
-  MemoChat.ReadOnly := True;
-  MemoChat.ScrollBars := ssAutoBoth;
-  MemoChat.Font.Name := 'Consolas';
-  MemoChat.Font.Size := 10;
+  // Setup chat display (TSynEdit)
+  ChatDisplay.Align := alClient;
+  ChatDisplay.ReadOnly := True;
+  ChatDisplay.ScrollBars := ssAutoBoth;
+  ChatDisplay.Font.Name := 'Consolas';
+  ChatDisplay.Font.Size := 10;
+  ChatDisplay.Color := clWhite;
+  ChatDisplay.Gutter.Visible := False;  // No line numbers for chat
   
   // Setup input panel
   PanelInput.Align := alBottom;
@@ -325,15 +327,12 @@ begin
     DisplayContent := Content;
   end;
   
-  MemoChat.Lines.Add('');
+  ChatDisplay.Lines.Add('');
   
-  // Set markdown rendering mode
-  MemoChat.RenderMarkdown := CheckBoxRenderMarkdown.Checked;
+  // Add message to SynEdit
+  ChatDisplay.Lines.Add(Prefix + DisplayContent);
   
-  // Add message with prefix
-  MemoChat.AddMarkdownText(Prefix + DisplayContent);
-  
-  MemoChat.Lines.Add('');
+  ChatDisplay.Lines.Add('');
   
   // Update stats after adding message
   UpdateStats;
