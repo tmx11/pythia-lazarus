@@ -53,6 +53,10 @@
         <Filename Value="Source\Pythia.SettingsForm.pas"/>
         <UnitName Value="Pythia.SettingsForm"/>
       </Item7>
+      <Item8>
+        <Filename Value="Source\Pythia.FileEdit.pas"/>
+        <UnitName Value="Pythia.FileEdit"/>
+      </Item8>
     </Files>
     <RequiredPkgs Count="3">
       <Item1>

@@ -35,7 +35,7 @@ var
 implementation
 
 uses
-  Pythia.Config, Pythia.SettingsForm;
+  Pythia.Config, Pythia.SettingsForm, Pythia.Context, Pythia.FileEdit;
 
 {$R *.lfm}
 
@@ -133,29 +133,72 @@ var
   UserMessage: string;
   Response: string;
   ModelName: string;
+  ContextProvider: IContextProvider;
+  CurrentContext: TContextItem;
+  ContextText: string;
+  Edits: TFileEditArray;
 begin
   FIsProcessing := True;
   ButtonSend.Enabled := False;
   try
     UserMessage := Trim(MemoInput.Text);
     ModelName := ComboModel.Text;
-    
+
     AddMessage('user', UserMessage);
     MemoInput.Clear;
-    
+
     Application.ProcessMessages;
-    
-    // Call AI client with message history
+
+    // Get current file context if available
+    ContextText := '';
     try
-      Response := TPythiaAIClient.SendMessage(FMessages, ModelName);
-      
-      if Response <> '' then
-        AddMessage('assistant', Response)
+      ContextProvider := GetContextProvider;
+      if ContextProvider.IsAvailable then
+      begin
+        CurrentContext := ContextProvider.GetCurrentFile;
+        if CurrentContext.Content <> '' then
+        begin
+          ContextText := 'File: ' + CurrentContext.FilePath + #13#10 +
+                        'Cursor: Line ' + IntToStr(CurrentContext.CursorLine) + 
+                        ', Column ' + IntToStr(CurrentContext.CursorColumn) + #13#10;
+          
+          if CurrentContext.Selection <> '' then
+            ContextText := ContextText + 'SELECTED TEXT (lines ' + 
+              IntToStr(CurrentContext.LineStart) + '-' + 
+              IntToStr(CurrentContext.LineEnd) + '):' + #13#10 + 
+              CurrentContext.Selection
+          else
+            ContextText := ContextText + 'FILE CONTENT:' + #13#10 + CurrentContext.Content;
+        end;
+      end;
+    except
+      // Context gathering failed - continue without context
+    end;
+
+    // Call AI client with message history and context
+    try
+      if ContextText <> '' then
+        Response := TPythiaAIClient.SendMessageWithContext(FMessages, ModelName, ContextText)
       else
-        AddMessage('assistant', 'Error: No response from AI');
+        Response := TPythiaAIClient.SendMessage(FMessages, ModelName);
+
+      if Response <> '' then
+      begin
+        AddMessage('assistant', Response);
+        
+        // Check if response contains file edit instructions
+        Edits := ParseFileEdits(Response);
+        if Length(Edits) > 0 then
+        begin
+          if ApplyFileEdits(Edits) then
+            AddMessage('system', 'Applied ' + IntToStr(Length(Edits)) + ' file edit(s)')
+          else
+            AddMessage('system', 'Warning: Some file edits could not be applied');
+        end;
+      end;
     except
       on E: Exception do
-        AddMessage('assistant', 'Error: ' + E.Message);
+        AddMessage('error', 'Error calling AI: ' + E.Message);
     end;
   finally
     FIsProcessing := False;

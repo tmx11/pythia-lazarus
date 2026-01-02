@@ -18,7 +18,7 @@ type
   private
     class function BuildOpenAIRequest(const Messages: TArray<TChatMessage>; const Model: string): string;
     class function BuildAnthropicRequest(const Messages: TArray<TChatMessage>; const Model: string): string;
-    class function BuildGitHubCopilotRequest(const Messages: TArray<TChatMessage>; const Model: string): string;
+    class function BuildGitHubCopilotRequest(const Messages: TArray<TChatMessage>; const Model: string; const Context: string = ''): string;
     class function CallOpenAI(const RequestBody: string): string;
     class function CallAnthropic(const RequestBody: string): string;
     class function CallGitHubCopilot(const RequestBody: string): string;
@@ -103,28 +103,6 @@ begin
         Result := 'Error: ' + E.Message;
     end;
   end;
-end;
-
-class function TPythiaAIClient.SendMessageWithContext(const Messages: TArray<TChatMessage>;
-  const Model, Context: string): string;
-var
-  ContextMessages: TArray<TChatMessage>;
-  I: Integer;
-begin
-  // Inject context as a system-level message at the start
-  SetLength(ContextMessages, Length(Messages) + 1);
-  
-  // Add context as first message
-  ContextMessages[0].Role := 'system';
-  ContextMessages[0].Content := Context;
-  ContextMessages[0].Timestamp := Now;
-  
-  // Copy original messages
-  for I := 0 to High(Messages) do
-    ContextMessages[I + 1] := Messages[I];
-  
-  // Use regular SendMessage with augmented messages
-  Result := SendMessage(ContextMessages, Model);
 end;
 
 class function TPythiaAIClient.BuildOpenAIRequest(const Messages: TArray<TChatMessage>; const Model: string): string;
@@ -248,12 +226,13 @@ begin
   end;
 end;
 
-class function TPythiaAIClient.BuildGitHubCopilotRequest(const Messages: TArray<TChatMessage>; const Model: string): string;
+class function TPythiaAIClient.BuildGitHubCopilotRequest(const Messages: TArray<TChatMessage>; const Model: string; const Context: string = ''): string;
 var
   JSON, MsgObj: TJSONObject;
   MsgArray: TJSONArray;
   Msg: TChatMessage;
   ModelName: string;
+  SystemPrompt: string;
 begin
   // Map display name to API model name
   if Pos('GPT-4', UpperCase(Model)) > 0 then
@@ -271,10 +250,8 @@ begin
     
     MsgArray := TJSONArray.Create;
     
-    // Add system message first
-    MsgObj := TJSONObject.Create;
-    MsgObj.Add('role', 'system');
-    MsgObj.Add('content', 'You are Pythia, an expert Delphi programming assistant. ' +
+    // Build system prompt with context if provided
+    SystemPrompt := 'You are Pythia, an expert Delphi programming assistant. ' +
       'Help users with Delphi code, explain concepts, debug issues, and provide best practices.' + #13#10 +
       'When editing files, use this JSON format to REPLACE specific line ranges:' + #13#10 +
       '```json' + #13#10 +
@@ -291,7 +268,16 @@ begin
       '```' + #13#10 +
       'CRITICAL: Lines startLine through endLine are COMPLETELY REPLACED with newText. ' +
       'Never duplicate lines - if line 1 is "unit X;", your newText should contain it ONCE. ' +
-      'If adding comments, include original code + comment in newText. Lines are 1-indexed.');
+      'If adding comments, include original code + comment in newText. Lines are 1-indexed.';
+    
+    // Add context if provided
+    if Context <> '' then
+      SystemPrompt := SystemPrompt + #13#10#13#10 + 'CURRENT FILE CONTEXT:' + #13#10 + Context;
+    
+    // Add system message
+    MsgObj := TJSONObject.Create;
+    MsgObj.Add('role', 'system');
+    MsgObj.Add('content', SystemPrompt);
     MsgArray.Add(MsgObj);
     
     // Add conversation messages
@@ -502,6 +488,36 @@ begin
         ErrMsg := ErrMsg + Response;
       raise Exception.Create(ErrMsg);
     end;
+  end;
+end;
+
+class function TPythiaAIClient.SendMessageWithContext(const Messages: TArray<TChatMessage>;
+  const Model: string; const Context: string): string;
+var
+  RequestBody: string;
+  Response: string;
+begin
+  Result := '';
+
+  // Initialize SSL on first use
+  InitializeSSL;
+
+  try
+    // Currently only GitHub Copilot supports context injection
+    if Pos('COPILOT', UpperCase(Model)) > 0 then
+    begin
+      RequestBody := BuildGitHubCopilotRequest(Messages, Model, Context);
+      Response := CallGitHubCopilot(RequestBody);
+      Result := ParseOpenAIResponse(Response);
+    end
+    else
+    begin
+      // Fall back to regular SendMessage for other models
+      Result := SendMessage(Messages, Model);
+    end;
+  except
+    on E: Exception do
+      Result := 'Error: ' + E.Message;
   end;
 end;
 

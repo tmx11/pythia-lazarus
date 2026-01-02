@@ -45,3 +45,9 @@ Thumbs.db
 # Packages and Compiled Libraries
 Lib/
 Packages/
+
+# Beads local files
+.beads/beads.db
+.beads/daemon.lock
+.beads/daemon.log
+.beads/*.meta.json
