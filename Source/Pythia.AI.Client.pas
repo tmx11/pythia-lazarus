@@ -436,23 +436,36 @@ var
   JSON: TJSONData;
   ChoicesArray: TJSONArray;
   Choice, Message: TJSONObject;
+  ErrMsg: string;
 begin
   Result := '';
-  JSON := GetJSON(Response);
   try
-    if JSON is TJSONObject then
-    begin
-      ChoicesArray := TJSONObject(JSON).Get('choices', TJSONArray(nil));
-      if Assigned(ChoicesArray) and (ChoicesArray.Count > 0) then
+    JSON := GetJSON(Response);
+    try
+      if JSON is TJSONObject then
       begin
-        Choice := ChoicesArray.Objects[0];
-        Message := Choice.Get('message', TJSONObject(nil));
-        if Assigned(Message) then
-          Result := Message.Get('content', '');
+        ChoicesArray := TJSONObject(JSON).Get('choices', TJSONArray(nil));
+        if Assigned(ChoicesArray) and (ChoicesArray.Count > 0) then
+        begin
+          Choice := ChoicesArray.Objects[0];
+          Message := Choice.Get('message', TJSONObject(nil));
+          if Assigned(Message) then
+            Result := Message.Get('content', '');
+        end;
       end;
+    finally
+      JSON.Free;
     end;
-  finally
-    JSON.Free;
+  except
+    on E: Exception do
+    begin
+      ErrMsg := 'JSON Parse Error: ' + E.Message + #13#10 + 'Response: ';
+      if Length(Response) > 400 then
+        ErrMsg := ErrMsg + Copy(Response, 1, 400) + '...'
+      else
+        ErrMsg := ErrMsg + Response;
+      raise Exception.Create(ErrMsg);
+    end;
   end;
 end;
 
@@ -461,21 +474,34 @@ var
   JSON: TJSONData;
   ContentArray: TJSONArray;
   ContentItem: TJSONObject;
+  ErrMsg: string;
 begin
   Result := '';
-  JSON := GetJSON(Response);
   try
-    if JSON is TJSONObject then
-    begin
-      ContentArray := TJSONObject(JSON).Get('content', TJSONArray(nil));
-      if Assigned(ContentArray) and (ContentArray.Count > 0) then
+    JSON := GetJSON(Response);
+    try
+      if JSON is TJSONObject then
       begin
-        ContentItem := ContentArray.Objects[0];
-        Result := ContentItem.Get('text', '');
+        ContentArray := TJSONObject(JSON).Get('content', TJSONArray(nil));
+        if Assigned(ContentArray) and (ContentArray.Count > 0) then
+        begin
+          ContentItem := ContentArray.Objects[0];
+          Result := ContentItem.Get('text', '');
+        end;
       end;
+    finally
+      JSON.Free;
     end;
-  finally
-    JSON.Free;
+  except
+    on E: Exception do
+    begin
+      ErrMsg := 'JSON Parse Error: ' + E.Message + #13#10 + 'Response: ';
+      if Length(Response) > 400 then
+        ErrMsg := ErrMsg + Copy(Response, 1, 400) + '...'
+      else
+        ErrMsg := ErrMsg + Response;
+      raise Exception.Create(ErrMsg);
+    end;
   end;
 end;
 
