@@ -209,6 +209,18 @@ begin
     if Context <> '' then
       MsgObj.Add('content', 'You are Pythia, an expert Free Pascal and Lazarus IDE programming assistant. ' +
         'Help users with Object Pascal code in Lazarus IDE, explain concepts, debug issues, and provide best practices for Free Pascal Compiler (FPC) 3.2.2 and Lazarus 3.2.0.' + #13#10#13#10 +
+        '⚡ MULTI-STEP TOOL USAGE:' + #13#10 +
+        'When you call a tool (like run_terminal_command), you will receive its output as a tool result message. ' +
+        'ALWAYS examine tool outputs carefully and use them to inform your next actions. ' +
+        'For multi-step tasks: call one tool, wait for its result, analyze the output, then call the next tool with information from the first.' + #13#10#13#10 +
+        'Example pattern:' + #13#10 +
+        '1. User asks: "Get current directory, then list files in it"' + #13#10 +
+        '2. You call: run_terminal_command with "Get-Location"' + #13#10 +
+        '3. Tool returns: "D:\\projects\\myapp"' + #13#10 +
+        '4. You analyze: "Current directory is D:\\projects\\myapp"' + #13#10 +
+        '5. You call: run_terminal_command with "Get-ChildItem -Path D:\\projects\\myapp"' + #13#10 +
+        '6. Tool returns: file list' + #13#10 +
+        '7. You respond: "Current directory is D:\\projects\\myapp. Here are the files: ..."' + #13#10#13#10 +
         'When editing files, use this JSON format to REPLACE specific line ranges:' + #13#10 +
         '```json' + #13#10 +
         '{' + #13#10 +
@@ -229,6 +241,18 @@ begin
     else
       MsgObj.Add('content', 'You are Pythia, an expert Free Pascal and Lazarus IDE programming assistant. ' +
         'Help users with Object Pascal code in Lazarus IDE, explain concepts, debug issues, and provide best practices for Free Pascal Compiler (FPC) 3.2.2 and Lazarus 3.2.0.' + #13#10#13#10 +
+        '⚡ MULTI-STEP TOOL USAGE:' + #13#10 +
+        'When you call a tool (like run_terminal_command), you will receive its output as a tool result message. ' +
+        'ALWAYS examine tool outputs carefully and use them to inform your next actions. ' +
+        'For multi-step tasks: call one tool, wait for its result, analyze the output, then call the next tool with information from the first.' + #13#10#13#10 +
+        'Example pattern:' + #13#10 +
+        '1. User asks: "Get current directory, then list files in it"' + #13#10 +
+        '2. You call: run_terminal_command with "Get-Location"' + #13#10 +
+        '3. Tool returns: "D:\\\\projects\\\\myapp"' + #13#10 +
+        '4. You analyze: "Current directory is D:\\\\projects\\\\myapp"' + #13#10 +
+        '5. You call: run_terminal_command with "Get-ChildItem -Path D:\\\\projects\\\\myapp"' + #13#10 +
+        '6. Tool returns: file list' + #13#10 +
+        '7. You respond: "Current directory is D:\\\\projects\\\\myapp. Here are the files: ..."' + #13#10#13#10 +
         'When editing files, use this JSON format to REPLACE specific line ranges:' + #13#10 +
         '```json' + #13#10 +
         '{' + #13#10 +
@@ -237,7 +261,7 @@ begin
         '      "file": "Source/MyUnit.pas",' + #13#10 +
         '      "startLine": 10,' + #13#10 +
         '      "endLine": 12,' + #13#10 +
-        '      "newText": "  // Comment\n  Line11Code;\n  Line12Code;"' + #13#10 +
+        '      "newText": "  // Comment\\n  Line11Code;\\n  Line12Code;"' + #13#10 +
         '    }' + #13#10 +
         '  ]' + #13#10 +
         '}' + #13#10 +
@@ -305,7 +329,19 @@ begin
     end;
     if Context <> '' then
       JSON.Add('system', 'You are Pythia, an expert Free Pascal and Lazarus IDE programming assistant. ' +
-        'Help users with Object Pascal code in Lazarus IDE, explain concepts, debug issues, and provide best practices for Free Pascal Compiler (FPC) 3.2.2 and Lazarus 3.2.0.' + #13#10 +
+        'Help users with Object Pascal code in Lazarus IDE, explain concepts, debug issues, and provide best practices for Free Pascal Compiler (FPC) 3.2.2 and Lazarus 3.2.0.' + #13#10#13#10 +
+        '⚡ MULTI-STEP TOOL USAGE:' + #13#10 +
+        'When you call a tool (like run_terminal_command), you will receive its output as a tool result message. ' +
+        'ALWAYS examine tool outputs carefully and use them to inform your next actions. ' +
+        'For multi-step tasks: call one tool, wait for its result, analyze the output, then call the next tool with information from the first.' + #13#10#13#10 +
+        'Example pattern:' + #13#10 +
+        '1. User asks: "Get current directory, then list files in it"' + #13#10 +
+        '2. You call: run_terminal_command with "Get-Location"' + #13#10 +
+        '3. Tool returns: "D:\\\\projects\\\\myapp"' + #13#10 +
+        '4. You analyze: "Current directory is D:\\\\projects\\\\myapp"' + #13#10 +
+        '5. You call: run_terminal_command with "Get-ChildItem -Path D:\\\\projects\\\\myapp"' + #13#10 +
+        '6. Tool returns: file list' + #13#10 +
+        '7. You respond: "Current directory is D:\\\\projects\\\\myapp. Here are the files: ..."' + #13#10#13#10 +
         'When editing files, use this JSON format to REPLACE specific line ranges:' + #13#10 +
         '```json' + #13#10 +
         '{' + #13#10 +
@@ -325,7 +361,19 @@ begin
         'CURRENT IDE CONTEXT:' + #13#10 + Context)
     else
       JSON.Add('system', 'You are Pythia, an expert Free Pascal and Lazarus IDE programming assistant. ' +
-        'Help users with Object Pascal code in Lazarus IDE, explain concepts, debug issues, and provide best practices for Free Pascal Compiler (FPC) 3.2.2 and Lazarus 3.2.0.' + #13#10 +
+        'Help users with Object Pascal code in Lazarus IDE, explain concepts, debug issues, and provide best practices for Free Pascal Compiler (FPC) 3.2.2 and Lazarus 3.2.0.' + #13#10#13#10 +
+        '⚡ MULTI-STEP TOOL USAGE:' + #13#10 +
+        'When you call a tool (like run_terminal_command), you will receive its output as a tool result message. ' +
+        'ALWAYS examine tool outputs carefully and use them to inform your next actions. ' +
+        'For multi-step tasks: call one tool, wait for its result, analyze the output, then call the next tool with information from the first.' + #13#10#13#10 +
+        'Example pattern:' + #13#10 +
+        '1. User asks: "Get current directory, then list files in it"' + #13#10 +
+        '2. You call: run_terminal_command with "Get-Location"' + #13#10 +
+        '3. Tool returns: "D:\\\\projects\\\\myapp"' + #13#10 +
+        '4. You analyze: "Current directory is D:\\\\projects\\\\myapp"' + #13#10 +
+        '5. You call: run_terminal_command with "Get-ChildItem -Path D:\\\\projects\\\\myapp"' + #13#10 +
+        '6. Tool returns: file list' + #13#10 +
+        '7. You respond: "Current directory is D:\\\\projects\\\\myapp. Here are the files: ..."' + #13#10#13#10 +
         'When editing files, use this JSON format to REPLACE specific line ranges:' + #13#10 +
         '```json' + #13#10 +
         '{' + #13#10 +
@@ -334,7 +382,7 @@ begin
         '      "file": "Source/MyUnit.pas",' + #13#10 +
         '      "startLine": 1,' + #13#10 +
         '      "endLine": 1,' + #13#10 +
-        '      "newText": "// Header comment\nunit MyUnit;"' + #13#10 +
+        '      "newText": "// Header comment\\nunit MyUnit;"' + #13#10 +
         '    }' + #13#10 +
         '  ]' + #13#10 +
         '}' + #13#10 +
@@ -416,7 +464,19 @@ begin
     
     // Build system prompt with context if provided
     SystemPrompt := 'You are Pythia, an expert Delphi programming assistant. ' +
-      'Help users with Delphi code, explain concepts, debug issues, and provide best practices.' + #13#10 +
+      'Help users with Delphi code, explain concepts, debug issues, and provide best practices.' + #13#10#13#10 +
+      '⚡ MULTI-STEP TOOL USAGE:' + #13#10 +
+      'When you call a tool (like run_terminal_command), you will receive its output as a tool result message. ' +
+      'ALWAYS examine tool outputs carefully and use them to inform your next actions. ' +
+      'For multi-step tasks: call one tool, wait for its result, analyze the output, then call the next tool with information from the first.' + #13#10#13#10 +
+      'Example pattern:' + #13#10 +
+      '1. User asks: "Get current directory, then list files in it"' + #13#10 +
+      '2. You call: run_terminal_command with "Get-Location"' + #13#10 +
+      '3. Tool returns: "D:\\projects\\myapp"' + #13#10 +
+      '4. You analyze: "Current directory is D:\\projects\\myapp"' + #13#10 +
+      '5. You call: run_terminal_command with "Get-ChildItem -Path D:\\projects\\myapp"' + #13#10 +
+      '6. Tool returns: file list' + #13#10 +
+      '7. You respond: "Current directory is D:\\projects\\myapp. Here are the files: ..."' + #13#10#13#10 +
       'When editing files, use this JSON format to REPLACE specific line ranges:' + #13#10 +
       '```json' + #13#10 +
       '{' + #13#10 +
