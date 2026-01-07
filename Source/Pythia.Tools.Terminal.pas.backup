@@ -78,8 +78,7 @@ begin
     AProcess.CurrentDirectory := GetCurrentDir;
     
     // Configure pipes for output
-    AProcess.Options := [poUsePipes, poStderrToOutPut, poNoConsole];
-    AProcess.ShowWindow := swoHIDE;
+    AProcess.Options := [poUsePipes, poStderrToOutPut];
     
     try
       AProcess.Execute;
