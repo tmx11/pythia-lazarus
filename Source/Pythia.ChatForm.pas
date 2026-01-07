@@ -21,6 +21,11 @@ type
     LabelStats: TLabel;
     ButtonRefreshContext: TButton;
     CheckBoxRenderMarkdown: TCheckBox;
+    SplitterTerminal: TSplitter;
+    PanelTerminal: TPanel;
+    MemoTerminal: TMemo;
+    ButtonClearTerminal: TButton;
+    CheckBoxShowTerminal: TCheckBox;
     PanelInput: TPanel;
     MemoInput: TMemo;
     ButtonSend: TButton;
@@ -32,11 +37,15 @@ type
     procedure ButtonSettingsClick(Sender: TObject);
     procedure ButtonRefreshContextClick(Sender: TObject);
     procedure MemoInputKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure ButtonClearTerminalClick(Sender: TObject);
+    procedure CheckBoxShowTerminalChange(Sender: TObject);
   private
     FMessages: TArray<TChatMessage>;
     FIsProcessing: Boolean;
     FTotalTokens: Integer;
     procedure AddMessage(const Role, Content: string);
+    procedure ExecuteCommand(const Command: string);
+    procedure AddTerminalOutput(const Text: string);
     procedure SendMessageToAI;
     procedure UpdateStatusBar;
     procedure UpdateGitBranch;
@@ -83,6 +92,28 @@ begin
   ChatDisplay.Font.Size := 10;
   ChatDisplay.Color := clWhite;
   ChatDisplay.WordWrap := True;  // Enable word wrap
+  
+  // Setup terminal pane (hidden by default)
+  PanelTerminal.Align := alBottom;
+  PanelTerminal.Height := 150;
+  PanelTerminal.Visible := False;
+  
+  MemoTerminal.Align := alClient;
+  MemoTerminal.ReadOnly := True;
+  MemoTerminal.ScrollBars := ssAutoBoth;
+  MemoTerminal.Font.Name := 'Consolas';
+  MemoTerminal.Font.Size := 9;
+  MemoTerminal.Color := clBlack;
+  MemoTerminal.Font.Color := clLime;
+  MemoTerminal.WordWrap := False;
+  
+  ButtonClearTerminal.Caption := 'Clear';
+  
+  CheckBoxShowTerminal.Caption := 'Show Terminal';
+  CheckBoxShowTerminal.Checked := False;
+  
+  SplitterTerminal.Align := alBottom;
+  SplitterTerminal.Visible := False;
   
   // Setup input panel
   PanelInput.Align := alBottom;
@@ -453,6 +484,79 @@ begin
     ButtonSend.Enabled := True;
     MemoInput.SetFocus;
   end;
+end;
+
+procedure TChatWindow.ExecuteCommand(const Command: string);
+var
+  Process: TProcess;
+  Output: string;
+  BytesRead: Integer;
+  Buffer: array[0..2047] of Byte;
+begin
+  AddTerminalOutput('> ' + Command);
+  
+  Process := TProcess.Create(nil);
+  try
+    Process.Executable := 'cmd.exe';
+    Process.Parameters.Add('/c');
+    Process.Parameters.Add(Command);
+    Process.Options := [poUsePipes, poNoConsole];
+    Process.CurrentDirectory := ExtractFileDir(ParamStr(0));
+    
+    try
+      Process.Execute;
+      
+      // Read output while process runs
+      while Process.Running do
+      begin
+        BytesRead := Process.Output.NumBytesAvailable;
+        if BytesRead > 0 then
+        begin
+          BytesRead := Process.Output.Read(Buffer, SizeOf(Buffer));
+          SetString(Output, PChar(@Buffer[0]), BytesRead);
+          AddTerminalOutput(Output);
+          Application.ProcessMessages;
+        end;
+      end;
+      
+      // Read any remaining output
+      repeat
+        BytesRead := Process.Output.NumBytesAvailable;
+        if BytesRead > 0 then
+        begin
+          BytesRead := Process.Output.Read(Buffer, SizeOf(Buffer));
+          SetString(Output, PChar(@Buffer[0]), BytesRead);
+          AddTerminalOutput(Output);
+        end;
+      until BytesRead <= 0;
+      
+      if Process.ExitStatus <> 0 then
+        AddTerminalOutput('[Exit code: ' + IntToStr(Process.ExitStatus) + ']');
+        
+    except
+      on E: Exception do
+        AddTerminalOutput('[Error: ' + E.Message + ']');
+    end;
+  finally
+    Process.Free;
+  end;
+end;
+
+procedure TChatWindow.AddTerminalOutput(const Text: string);
+begin
+  MemoTerminal.Lines.Add(Text);
+  MemoTerminal.SelStart := Length(MemoTerminal.Text);
+end;
+
+procedure TChatWindow.ButtonClearTerminalClick(Sender: TObject);
+begin
+  MemoTerminal.Clear;
+end;
+
+procedure TChatWindow.CheckBoxShowTerminalChange(Sender: TObject);
+begin
+  PanelTerminal.Visible := CheckBoxShowTerminal.Checked;
+  SplitterTerminal.Visible := CheckBoxShowTerminal.Checked;
 end;
 
 end.

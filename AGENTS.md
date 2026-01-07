@@ -1,15 +1,34 @@
 # Agent Instructions
 
-This project uses **bd** (beads) for issue tracking. Run `bd onboard` to get started.
+This project uses **bd** (beads) for issue tracking. Issues stored in `.beads/issues.jsonl`.
 
-## Quick Reference
+## Build & Install Workflow
+
+**ALWAYS use this automated script for package installation:**
+```powershell
+.\CLEAN_INSTALL.ps1
+```
+
+This script:
+1. Stops Lazarus IDE
+2. Removes old package registrations from AppData
+3. Cleans `lib/` build artifacts
+4. Compiles package: `lazbuild --build-all pythia.lpk`
+5. Rebuilds IDE: `lazbuild --add-package pythia.lpk --build-ide=`
+6. Starts Lazarus IDE
+
+**NEVER** use manual Component > Install Packages - CLEAN_INSTALL.ps1 is fully automated.
+
+## Beads Quick Reference
 
 ```bash
-bd ready              # Find available work
-bd show <id>          # View issue details
-bd update <id> --status in_progress  # Claim work
-bd close <id>         # Complete work
-bd sync               # Sync with git
+# Check .beads/issues.jsonl for status directly
+cat .beads/issues.jsonl | grep '"status":"open"'
+
+# Manual issue management
+# Create: Add line to .beads/issues.jsonl
+# Update: Edit status field in JSON line
+# Close: Set status="closed", add closed_at timestamp
 ```
 
 ## Landing the Plane (Session Completion)
