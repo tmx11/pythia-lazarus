@@ -46,6 +46,7 @@ type
     procedure AddMessage(const Role, Content: string);
     procedure ExecuteCommand(const Command: string);
     procedure AddTerminalOutput(const Text: string);
+    procedure ParseAndExecuteCommands(const Response: string);
     procedure SendMessageToAI;
     procedure UpdateStatusBar;
     procedure UpdateGitBranch;
@@ -474,6 +475,9 @@ begin
           else
             AddMessage('system', 'Warning: Some file edits could not be applied');
         end;
+        
+        // Check if response contains terminal commands
+        ParseAndExecuteCommands(Response);
       end;
     except
       on E: Exception do
@@ -483,6 +487,55 @@ begin
     FIsProcessing := False;
     ButtonSend.Enabled := True;
     MemoInput.SetFocus;
+  end;
+end;
+
+procedure TChatWindow.ParseAndExecuteCommands(const Response: string);
+var
+  Lines: TStringList;
+  I: Integer;
+  Line, Command: string;
+  InCommandBlock: Boolean;
+begin
+  // Parse response for ```terminal or ```powershell code blocks
+  Lines := TStringList.Create;
+  try
+    Lines.Text := Response;
+    InCommandBlock := False;
+    
+    for I := 0 to Lines.Count - 1 do
+    begin
+      Line := Trim(Lines[I]);
+      
+      // Check for command block start
+      if (Line = '```terminal') or (Line = '```powershell') or (Line = '```bash') or (Line = '```cmd') then
+      begin
+        InCommandBlock := True;
+        // Auto-show terminal if hidden
+        if not PanelTerminal.Visible then
+        begin
+          CheckBoxShowTerminal.Checked := True;
+          PanelTerminal.Visible := True;
+        end;
+        Continue;
+      end;
+      
+      // Check for command block end
+      if InCommandBlock and (Line = '```') then
+      begin
+        InCommandBlock := False;
+        Continue;
+      end;
+      
+      // Execute command if inside block
+      if InCommandBlock and (Line <> '') then
+      begin
+        Command := Line;
+        ExecuteCommand(Command);
+      end;
+    end;
+  finally
+    Lines.Free;
   end;
 end;
 

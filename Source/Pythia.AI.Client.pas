@@ -133,7 +133,13 @@ begin
     MsgObj.Add('role', 'system');
     if Context <> '' then
       MsgObj.Add('content', 'You are Pythia, an expert Free Pascal and Lazarus IDE programming assistant. ' +
-        'Help users with Object Pascal code in Lazarus IDE, explain concepts, debug issues, and provide best practices for Free Pascal Compiler (FPC) 3.2.2 and Lazarus 3.2.0.' + #13#10 +
+        'Help users with Object Pascal code in Lazarus IDE, explain concepts, debug issues, and provide best practices for Free Pascal Compiler (FPC) 3.2.2 and Lazarus 3.2.0.' + #13#10#13#10 +
+        'TERMINAL ACCESS: You have access to a Windows terminal and can execute commands! ' +
+        'Use ```powershell or ```terminal code blocks to run commands. Example:' + #13#10 +
+        '```powershell' + #13#10 +
+        'cd' + #13#10 +
+        '```' + #13#10 +
+        'Available commands: cd, dir, lazbuild, git, type, etc. Commands execute in project directory.' + #13#10#13#10 +
         'When editing files, use this JSON format to REPLACE specific line ranges:' + #13#10 +
         '```json' + #13#10 +
         '{' + #13#10 +
@@ -153,7 +159,13 @@ begin
         'CURRENT IDE CONTEXT:' + #13#10 + Context)
     else
       MsgObj.Add('content', 'You are Pythia, an expert Free Pascal and Lazarus IDE programming assistant. ' +
-        'Help users with Object Pascal code in Lazarus IDE, explain concepts, debug issues, and provide best practices for Free Pascal Compiler (FPC) 3.2.2 and Lazarus 3.2.0.' + #13#10 +
+        'Help users with Object Pascal code in Lazarus IDE, explain concepts, debug issues, and provide best practices for Free Pascal Compiler (FPC) 3.2.2 and Lazarus 3.2.0.' + #13#10#13#10 +
+        'TERMINAL ACCESS: You have access to a Windows terminal and can execute commands! ' +
+        'Use ```powershell or ```terminal code blocks to run commands. Example:' + #13#10 +
+        '```powershell' + #13#10 +
+        'cd' + #13#10 +
+        '```' + #13#10 +
+        'Available commands: cd, dir, lazbuild, git, type, etc. Commands execute in project directory.' + #13#10#13#10 +
         'When editing files, use this JSON format to REPLACE specific line ranges:' + #13#10 +
         '```json' + #13#10 +
         '{' + #13#10 +
