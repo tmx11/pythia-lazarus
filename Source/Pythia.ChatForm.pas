@@ -6,7 +6,8 @@ interface
 
 uses
   LCLIntf, LCLType, Classes, SysUtils, Forms, Controls, Graphics, Dialogs,
-  StdCtrls, ComCtrls, ExtCtrls, Process, Pythia.AI.Client, Pythia.AI.Response;
+  StdCtrls, ComCtrls, ExtCtrls, Process, Pythia.AI.Client, Pythia.AI.Response,
+  Pythia.Tools, Pythia.Tools.Terminal;
 
 const
   PYTHIA_VERSION = 'v1.2.0-20260102';
@@ -122,6 +123,9 @@ begin
   
   // Wire up Shift+Enter handler
   MemoInput.OnKeyDown := MemoInputKeyDown;
+  
+  // Register tools
+  ToolRegistry.RegisterTool(TTerminalTool.Create);
   
   // Setup model selector
   ComboModel.Items.Clear;
@@ -411,12 +415,15 @@ end;
 procedure TChatWindow.SendMessageToAI;
 var
   UserMessage: string;
-  Response: TAIResponse;  // Changed from string to TAIResponse
+  Response: TAIResponse;
   ModelName: string;
   ContextProvider: IContextProvider;
   CurrentContext: TContextItem;
   ContextText: string;
   Edits: TFileEditArray;
+  MaxIterations: Integer;
+  ToolResults: TToolResultArray;
+  I: Integer;
 begin
   FIsProcessing := True;
   ButtonSend.Enabled := False;
@@ -462,7 +469,35 @@ begin
       else
         Response := TPythiaAIClient.SendMessage(FMessages, ModelName);
 
-      // Display text response if any
+      // Handle tool calls loop
+      MaxIterations := 10;
+      
+      while Response.HasToolCalls and (MaxIterations > 0) do
+      begin
+        Dec(MaxIterations);
+        
+        // Execute all requested tools
+        SetLength(ToolResults, Length(Response.ToolCalls));
+        for I := 0 to High(Response.ToolCalls) do
+        begin
+          AddMessage('system', '⚙️ Executing: ' + Response.ToolCalls[I].ToolName + '...');
+          ToolResults[I] := ToolRegistry.ExecuteToolCall(Response.ToolCalls[I]);
+          
+          // Show terminal output if it's a terminal command
+          if Response.ToolCalls[I].ToolName = 'run_terminal_command' then
+          begin
+            AddTerminalOutput(ToolResults[I].Output);
+            PanelTerminal.Visible := True;
+            CheckBoxShowTerminal.Checked := True;
+            SplitterTerminal.Visible := True;
+          end;
+        end;
+        
+        // Send tool results back to AI for final response
+        Response := TPythiaAIClient.SendMessageWithToolResults(FMessages, ModelName, ToolResults, ContextText);
+      end;
+      
+      // Display final text response if any
       if Response.Text <> '' then
       begin
         AddMessage('assistant', Response.Text);
@@ -476,14 +511,7 @@ begin
           else
             AddMessage('system', 'Warning: Some file edits could not be applied');
         end;
-        
-        // Check if response contains terminal commands (old method - will be replaced by tool calls)
-        ParseAndExecuteCommands(Response.Text);
       end;
-      
-      // TODO: Handle tool calls here
-      // if Response.HasToolCalls then
-      //   ExecuteToolCalls(Response.ToolCalls);
     except
       on E: Exception do
         AddMessage('error', 'Error calling AI: ' + E.Message);
