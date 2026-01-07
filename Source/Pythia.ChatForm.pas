@@ -6,7 +6,7 @@ interface
 
 uses
   LCLIntf, LCLType, Classes, SysUtils, Forms, Controls, Graphics, Dialogs,
-  StdCtrls, ComCtrls, ExtCtrls, Process, Pythia.AI.Client;
+  StdCtrls, ComCtrls, ExtCtrls, Process, Pythia.AI.Client, Pythia.AI.Response;
 
 const
   PYTHIA_VERSION = 'v1.2.0-20260102';
@@ -411,7 +411,7 @@ end;
 procedure TChatWindow.SendMessageToAI;
 var
   UserMessage: string;
-  Response: string;
+  Response: TAIResponse;  // Changed from string to TAIResponse
   ModelName: string;
   ContextProvider: IContextProvider;
   CurrentContext: TContextItem;
@@ -462,12 +462,13 @@ begin
       else
         Response := TPythiaAIClient.SendMessage(FMessages, ModelName);
 
-      if Response <> '' then
+      // Display text response if any
+      if Response.Text <> '' then
       begin
-        AddMessage('assistant', Response);
+        AddMessage('assistant', Response.Text);
         
         // Check if response contains file edit instructions
-        Edits := ParseFileEdits(Response);
+        Edits := ParseFileEdits(Response.Text);
         if Length(Edits) > 0 then
         begin
           if ApplyFileEdits(Edits) then
@@ -476,9 +477,13 @@ begin
             AddMessage('system', 'Warning: Some file edits could not be applied');
         end;
         
-        // Check if response contains terminal commands
-        ParseAndExecuteCommands(Response);
+        // Check if response contains terminal commands (old method - will be replaced by tool calls)
+        ParseAndExecuteCommands(Response.Text);
       end;
+      
+      // TODO: Handle tool calls here
+      // if Response.HasToolCalls then
+      //   ExecuteToolCalls(Response.ToolCalls);
     except
       on E: Exception do
         AddMessage('error', 'Error calling AI: ' + E.Message);

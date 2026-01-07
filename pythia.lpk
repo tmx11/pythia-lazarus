@@ -23,7 +23,7 @@
     </CompilerOptions>
     <Description Value="Pythia AI Chat - Delphi programming assistant with AI models"/>
     <Version Major="1"/>
-    <Files Count="7">
+    <Files Count="11">
       <Item1>
         <Filename Value="Source\Pythia.Register.pas"/>
         <HasRegisterProc Value="True"/>
@@ -57,6 +57,18 @@
         <Filename Value="Source\Pythia.FileEdit.pas"/>
         <UnitName Value="Pythia.FileEdit"/>
       </Item8>
+      <Item9>
+        <Filename Value="Source\Pythia.Tools.pas"/>
+        <UnitName Value="Pythia.Tools"/>
+      </Item9>
+      <Item10>
+        <Filename Value="Source\Pythia.Tools.Terminal.pas"/>
+        <UnitName Value="Pythia.Tools.Terminal"/>
+      </Item10>
+      <Item11>
+        <Filename Value="Source\Pythia.AI.Response.pas"/>
+        <UnitName Value="Pythia.AI.Response"/>
+      </Item11>
     </Files>
     <RequiredPkgs Count="3">
       <Item1>

@@ -9,7 +9,8 @@ interface
 
 uses
   Pythia.Register, Pythia.ChatForm, Pythia.Config, Pythia.Context, 
-  Pythia.AI.Client, Pythia.GitHub.Auth, Pythia.SettingsForm, LazarusPackageIntf;
+  Pythia.AI.Client, Pythia.GitHub.Auth, Pythia.SettingsForm, Pythia.FileEdit, 
+  Pythia.Tools, Pythia.Tools.Terminal, Pythia.AI.Response, LazarusPackageIntf;
 
 implementation
 
